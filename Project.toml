@@ -1,0 +1,13 @@
+name = "LotMassing"
+uuid = "ea8d06f2-d1a5-4ac4-9c8a-c9d88320a1df"
+authors = ["Raimundo Vial <rjvial@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
