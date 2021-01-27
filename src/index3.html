@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Display a map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <!-- Mapbox -->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- Slider -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/11.1.0/nouislider.min.css" />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/11.1.0/nouislider.min.js'></script>
+
+    <!-- Moment.js -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .slider-control-container {
+        padding: 5px;
+    }
+
+    .slider-control-range-display {
+        font-size: 18px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        font-weight: 700;
+    }
+
+    #filters {
+        position: absolute;
+        top: 0;
+        z-index: 1000
+    }
+
+    /*
+    class to change color
+    .noUi-connect {
+        background: #2980b9;
+    }
+    */
+    </style>
+</head>
+
+<body>
+    
+    <div id='map'></div>
+    <script src="rangeSlider.js"></script>
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoicnZpYWwiLCJhIjoiY2tjeTZ2MWdkMDF3ajMxcG1la3ZoY3cyNiJ9.sCVIT6WJAC8_TuAh0AfFTw';
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/light-v9', // stylesheet location
+        center: [-70.628, -33.447], // starting position [lng, lat]
+        zoom: 13 // starting zoom
+    });
+
+    var sliderOptions = {
+        elm: 'slider-control',
+        layer: 'layer_predios',
+        source: 'predios',
+        controlWidth: '400px',
+        minProperty: 'min',
+        maxProperty: 'max',
+        sliderMin: 10,
+        sliderMax: 50000,
+        filterMin: 100,
+        filterMax: 2000,
+        propertyType: 'float',
+        rangeDescriptionFormat: 'float',
+        descriptionPrefix: 'Area:'
+    }
+
+    map.addControl(new RangeSlider(sliderOptions, 'top-right'));
+
+
+    map.on('load', function () {
+        map.addSource('predios', {
+        'type': 'vector',
+        'url': 'mapbox://rvial.dgb3ug9n'
+    });
+    map.addLayer(
+        {
+            'id': 'layer_predios',
+            'type': 'fill',
+            'source': 'predios',
+            'source-layer': 'Predios_Metropolitana-dj1vj9',
+            'layout': { 'visibility': 'visible' },
+            'paint': {
+                'fill-outline-color': '#406482',
+                'fill-color': '#16b6ab',
+                'fill-opacity': 0.5
+            }
+        }
+    );
+
+    })
+
+
+    //Toggle Filter
+    //Toggle Filter
+   // RangeSlider.prototype.displayFilteredFeatures(map, RangeSlider.prototype.currentMinMaxVals)
+
+
+
+    </script>
+</body>
+
+</html>

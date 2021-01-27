@@ -1,4 +1,4 @@
-module LotMassing
+module Cabida
 
 using NPFinancial, JuMP, GAMS, Evolutionary, Polyhedra #, Cbc
 
