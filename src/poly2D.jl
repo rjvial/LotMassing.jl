@@ -1,6 +1,6 @@
 module poly2D
     
-using QHull, Statistics, LinearAlgebra, Clipper, Devices, PyPlot
+using QHull, Statistics, LinearAlgebra, Clipper, Devices, PyPlot, LazySets
 
 """
 """
@@ -675,8 +675,13 @@ end
 
 
 function convHull(V)
-    ch_V = QHull.chull(V)
-    V_out = V[ch_V.vertices,:]
+    
+    n = size(V,1)
+    v = [[V[i,1], V[i,2]] for i=1:n]
+    ch_v = LazySets.convex_hull(v)
+
+    V_out = [0 0]; for i=1:length(ch_v); V_out=[V_out; ch_v[i]']; end; V_out = V_out[2:end,:]
+    
     return V_out
 end
 

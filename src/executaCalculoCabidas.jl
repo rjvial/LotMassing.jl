@@ -62,12 +62,11 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         
         total_fit = 0
 
-        total_vol = areaBasal * alt;
-        if total_vol > 0
+        if areaBasal > 0
 
             penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
-            total_fit = total_vol * (1 - penalizacionCoefOcup )
+            total_fit = (areaBasal - penalizacionCoefOcup)*alt
         else
             total_fit = -1000
         end
@@ -82,8 +81,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         
         total_fit = 0
 
-        total_vol = areaBasal * alt;
-        if total_vol > 0
+        if areaBasal > 0
             ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
 
             areaSombraEdif_p = polyShape.polyArea_v2(ps_sombraEdif_p)
@@ -99,7 +97,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
-            total_fit = total_vol * (1 - (penalizacion_r + penalizacionCoefOcup + (penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s)^2) )
+            total_fit = alt*(areaBasal - penalizacion_r - penalizacionCoefOcup - (penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
         else
             total_fit = -1000
         end
@@ -182,7 +180,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             numParticles = 2000# 2000;
             maxIterations = 300# 300;
-            xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
+            #xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
+            xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
+            #xopt_cs, fopt_cs = evol(fitness_ss, lb, ub, numParticles, maxIterations, false)
 
         end
             
