@@ -80,27 +80,23 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         alt, areaBasal, ps_base, ps_baseSeparada, polyCorte = resultConverter_v2(x, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
         
         total_fit = 0
+        ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
 
-        if areaBasal > 0
-            ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
+        areaSombraEdif_p = polyShape.polyArea_v2(ps_sombraEdif_p)
+        areaSombraEdif_o = polyShape.polyArea_v2(ps_sombraEdif_o)
+        areaSombraEdif_s = polyShape.polyArea_v2(ps_sombraEdif_s)
+        penalizacionSombra_p = max(0, areaSombraEdif_p - areaSombra_p)
+        penalizacionSombra_o = max(0, areaSombraEdif_o - areaSombra_o)
+        penalizacionSombra_s = max(0, areaSombraEdif_s - areaSombra_s)
+        
+        ps_r = polyShape.polyDifference_v3(ps_base, ps_areaEdif) #Sector de la base del edificio que sobrepasa el areaEdif
+        area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
+        penalizacion_r = area_r^1.1
 
-            areaSombraEdif_p = polyShape.polyArea_v2(ps_sombraEdif_p)
-            areaSombraEdif_o = polyShape.polyArea_v2(ps_sombraEdif_o)
-            areaSombraEdif_s = polyShape.polyArea_v2(ps_sombraEdif_s)
-            penalizacionSombra_p = max(0, areaSombraEdif_p - areaSombra_p)
-            penalizacionSombra_o = max(0, areaSombraEdif_o - areaSombra_o)
-            penalizacionSombra_s = max(0, areaSombraEdif_s - areaSombra_s)
-            
-            ps_r = polyShape.polyDifference_v3(ps_base, ps_areaEdif) #Sector de la base del edificio que sobrepasa el areaEdif
-            area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
-            penalizacion_r = area_r <= 0*1 ? 0 : area_r
+        penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
-            penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
+        total_fit = alt*(areaBasal - 5*(penalizacion_r + penalizacionCoefOcup + penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
 
-            total_fit = alt*(areaBasal - penalizacion_r - penalizacionCoefOcup - (penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
-        else
-            total_fit = -1000
-        end
 
         return -total_fit
     end
@@ -172,11 +168,16 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
 
         elseif t == 4
+            largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
+            maxDiagonal = maximum(largosDiag)
+
             min_alfa = 0;
             max_alfa =  pi / 2;
-    
-            lb = [min_alt, min_theta, min_alfa, xmin, ymin, t];
-            ub = [max_alt, max_theta, max_alfa, xmax, ymax, t];
+            min_largo1 = anchoLado; max_largo1 = maxDiagonal
+            min_largo2 = anchoLado; max_largo2 = maxDiagonal
+
+            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, t];
+            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, t];
 
             numParticles = 2000# 2000;
             maxIterations = 300# 300;

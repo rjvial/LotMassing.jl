@@ -231,8 +231,8 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         pos_x = x[4]
         pos_y = x[5]
     
-        largo1 = anchoLado # 
-        largo2 = anchoLado # 
+        largo1 = x[6] # 
+        largo2 = x[7] # 
     
         R1 = poly2D.rotationMatrix(theta);
         cr1 = [pos_x; pos_y]
@@ -253,38 +253,11 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         ps2 = PolyShape([V2], 1)
         psCorte = PolyShape([polyCorte_alt], 1)
     
-        flagV1 = polyShape.isPolyInPoly(ps1, psCorte)
-        flagV2 = polyShape.isPolyInPoly(ps2, psCorte)
     
-            
-        if flagV1 && flagV2
-            V1_ = poly2D.expandPolygonSide(V1, 500, 2)
-            pV1 = V1[[2, 3],:]
-            VX1 = poly2D.intersectPoly2d(polyCorte_alt, V1_)
-            DM1 = poly2D.distanceMat(pV1, VX1[:,[3,4]])
-            minD1 = minimum(DM1)
-            V1__ = poly2D.expandPolygonSide(V1, minD1, 2)
-            ps1max = PolyShape([V1__], 1)
-    
-    
-            V2_ = poly2D.expandPolygonSide(V2, 500, 3)
-            pV2 = V2[[3, 4],:]
-            VX2 = poly2D.intersectPoly2d(polyCorte_alt, V2_)
-            DM2 = poly2D.distanceMat(pV2, VX2[:,[3,4]])
-            minD2 = minimum(DM2)
-            V2__ = poly2D.expandPolygonSide(V2, minD2, 3)
-            ps2max = PolyShape([V2__], 1)
-                
-            ps_base = polyShape.polyUnion_v2(ps1max, ps2max)
-            areaBasal = polyShape.polyArea_v2(ps_base)
-            ps_baseSeparada = PolyShape([V1__, V2__], 2)
-    
-        else 
-            areaBasal = -1000
-            ps_base = []
-            ps_baseSeparada = []
-        end
-     
+        ps_base = polyShape.polyUnion_v2(ps1, ps2)
+        areaBasal = polyShape.polyArea_v2(ps_base)
+        ps_baseSeparada = PolyShape([V1, V2], 2)
+
      
     end
 
