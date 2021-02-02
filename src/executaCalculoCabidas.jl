@@ -58,7 +58,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
 
     function fitness_ss(x)  # Función de Fitness Sin Sombra
-        alt, areaBasal, ps_base, ps_baseSeparada, polyCorte = resultConverter_v2(x, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(x, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
         
         total_fit = 0
 
@@ -77,7 +77,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
     function fitness_cs(x)  # Función de Fitness Con Sombra
 
-        alt, areaBasal, ps_base, ps_baseSeparada, polyCorte = resultConverter_v2(x, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(x, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
         
         total_fit = 0
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
@@ -89,7 +89,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         penalizacionSombra_o = max(0, areaSombraEdif_o - areaSombra_o)
         penalizacionSombra_s = max(0, areaSombraEdif_s - areaSombra_s)
         
-        ps_r = polyShape.polyDifference_v3(ps_base, ps_areaEdif) #Sector de la base del edificio que sobrepasa el areaEdif
+        ps_r = polyShape.polyDifference_v3(ps_base, psCorte) #Sector de la base del edificio que sobrepasa el areaEdif
         area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
         penalizacion_r = area_r^1.1
 
@@ -119,11 +119,10 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         min_largo = anchoLado;
         max_largo = 100;
-
         min_largo1 = anchoLado;
-        max_largo1 = 2*anchoLado;
+        max_largo1 = 100;
         min_largo2 = anchoLado;
-        max_largo2 = 2*anchoLado;
+        max_largo2 = 100;
 
         xmin = minimum(V_areaEdif[:,1]);  xmax = maximum(V_areaEdif[:,1]);
         ymin = minimum(V_areaEdif[:,2]);  ymax = maximum(V_areaEdif[:,2]);
@@ -132,12 +131,12 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             min_alfa = 0;
             max_alfa = pi / 2;
 
-            lb = [min_alt, min_theta, min_alfa, xmin, ymin, t];
-            ub = [max_alt, max_theta, max_alfa, xmax, ymax, t];
+            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2,t];
+            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2,t];
 
             numParticles = 1500# 500;
             maxIterations = 200# 100;
-            xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
+            xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
 
         elseif t == 2
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
@@ -147,25 +146,15 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             min_phi2 = 0; max_phi2 =  pi / 2;
             min_largo0 = 3 * anchoLado; max_largo0 = maxDiagonal
 
-            lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, t];
-            ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, t];       
+            lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, t];
+            ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, t];       
 
             numParticles = 3000# 500;
             maxIterations = 70# 100;
-            xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
+            xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
             
         elseif t == 3
-            largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
-            maxDiagonal = maximum(largosDiag)
-
-            min_largo0 = anchoLado; max_largo0 = maxDiagonal
-
-            lb = [min_alt, min_theta, xmin, ymin, min_largo0, t];
-            ub = [max_alt, max_theta, xmax, ymax, max_largo0, t];       
-
-            numParticles = 2000# 500;
-            maxIterations = 70# 200;
-            xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
+            
 
         elseif t == 4
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
@@ -188,7 +177,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         end
             
         
-        alt, areaBasal, ps_base, ps_baseSeparada, polyCorte = resultConverter_v2(xopt_cs, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(xopt_cs, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
         alturaEdif = numPisos * dca.ALTURAPISO
         sn, sa, si, st, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
@@ -211,7 +200,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             
     end
     
-    return resultados, ps_predio, ps_base, xopt_cs, fopt_cs, polyCorte, 
+    return resultados, ps_predio, ps_base, xopt_cs, fopt_cs, psCorte, 
             ps_SombraVolTeor_p, ps_sombraEdif_p, ps_SombraVolTeor_s, ps_sombraEdif_s, ps_SombraVolTeor_o, ps_sombraEdif_o
 end
 
