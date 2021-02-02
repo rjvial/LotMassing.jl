@@ -62,14 +62,12 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         
         total_fit = 0
 
-        if areaBasal > 0
+        ps_r = polyShape.polyDifference_v3(ps_base, psCorte) #Sector de la base del edificio que sobrepasa el areaEdif
+        area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
+        penalizacion_r = area_r^1.1
+        penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
-            penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
-
-            total_fit = (areaBasal - penalizacionCoefOcup)*alt
-        else
-            total_fit = -1000
-        end
+        total_fit = alt*(areaBasal - 5*(penalizacionCoefOcup + penalizacion_r))
 
         return -total_fit
     end
@@ -170,10 +168,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             numParticles = 2000# 2000;
             maxIterations = 300# 300;
-            #xopt_cs, fopt_cs = combinaSoluciones_v2(fitness_ss, fitness_cs, lb, ub, numParticles, maxIterations)
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
-            #xopt_cs, fopt_cs = evol(fitness_ss, lb, ub, numParticles, maxIterations, false)
-
+ 
         end
             
         

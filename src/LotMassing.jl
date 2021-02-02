@@ -363,12 +363,10 @@ include("generaSombraTeor_v3.jl")
 include("randomPointsNearVertices.jl")
 include("ajusteArea.jl")
 include("generaSupBruta.jl")
-include("combinaSoluciones_v2.jl")
 
 export generaMatCeldasConf, infoPredio, calculaAnguloRotacion, ismembern, plotCabidaOptima,  
        pso, generaCalles, generaSombraEdificio,
        optiEdificio,  displayResults, evol, poly2D, polyShape, 
        nonconv2sumofconv_v2, resultConverter_v2, plotBaseEdificio3d_v2,
-       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, randomPointsNearVertices, ajusteArea, generaSupBruta,
-       combinaSoluciones_v2
+       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, randomPointsNearVertices, ajusteArea, generaSupBruta
 end
