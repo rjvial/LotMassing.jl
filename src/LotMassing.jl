@@ -1,6 +1,6 @@
 module LotMassing
 
-using NPFinancial, JuMP, GAMS, Evolutionary, Polyhedra #, Cbc
+using NPFinancial, JuMP, GAMS, Evolutionary, Polyhedra, Cbc
 
 
 
