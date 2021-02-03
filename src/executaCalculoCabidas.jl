@@ -93,6 +93,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
+        #V_ch = poly2D.convHull(ps_base.Vertices[1])
+        #area_ch = poly2D.polyArea(V_ch)
+
         total_fit = alt*(areaBasal - 5*(penalizacion_r + penalizacionCoefOcup + penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
 
 
@@ -132,8 +135,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2,t];
             ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2,t];
 
-            numParticles = 1500# 500;
-            maxIterations = 200# 100;
+            numParticles = 2000# 500;
+            maxIterations = 300# 100;
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
 
         elseif t == 2
@@ -147,8 +150,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, t];
             ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, t];       
 
-            numParticles = 3000# 500;
-            maxIterations = 70# 100;
+            numParticles = 2000# 500;
+            maxIterations = 300# 100;
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
             
         elseif t == 3
@@ -160,8 +163,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             min_alfa = 0;
             max_alfa =  pi / 2;
-            min_largo1 = anchoLado; max_largo1 = maxDiagonal
-            min_largo2 = anchoLado; max_largo2 = maxDiagonal
 
             lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, t];
             ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, t];
