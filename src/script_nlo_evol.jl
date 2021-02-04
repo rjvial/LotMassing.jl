@@ -16,7 +16,7 @@ using LotMassing, .poly2D, .polyShape, Random, CSV
 ##############################################
 
 idPredio = 8#9#3 # predio = 1,2,3,4,5,6,75,8
-conjuntoTemplates = [4]#[1:L, 2:C, 3:H, 4:V]
+conjuntoTemplates = [2]#[1:L, 2:C, 3:H, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
                      true,  # volTeor
@@ -234,18 +234,10 @@ elseif idPredio == 8
 
     dca.ANCHOMAX = 8 # Ancho Crujía (m)
 
-    nombreArchivo = "predioLaFlorida2.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
-    numDatos = length(loadData)
-    x = zeros(1,numDatos)
-    y = zeros(1,numDatos)
-    for i = 1:numDatos
-        x[i] = loadData[i].Column1
-        y[i] = loadData[i].Column2
-    end
-    areaSup = x[1]
-    x = x[2:end]
-    y = y[2:end]
+
+    areaSup = 2511.37
+    x = [-70.61035931110382 -70.61013400554657 -70.6109869480133 -70.61110496520996]'
+    y = [-33.51000022582942 -33.510184728438766 -33.510845580011456 -33.51071587011779]'
     V = [x y]
     V = polyShape.reversePath(V);
     x = V[1:end,1]
@@ -282,7 +274,7 @@ elseif idPredio == 9
 
     #nombreArchivo = "el_dante_2.csv"
     nombreArchivo = "predio_ElDante.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
+    loadData = CSV.File(string("", nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1,numDatos)
     y = zeros(1,numDatos)
@@ -309,4 +301,3 @@ resultados, ps_predio, ps_base, xopt_cs, fopt_cs, polyCorte,
 ps_SombraVolTeor_p, ps_sombraEdif_p, 
 ps_SombraVolTeor_o, ps_sombraEdif_o, 
 ps_SombraVolTeor_s, ps_sombraEdif_s = executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoTemplates);
-
