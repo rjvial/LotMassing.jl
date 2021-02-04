@@ -198,10 +198,10 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
         
-        #fig = plotBaseEdificio3d_v2(fpe, resultados[cont].Xopt[1], dca.ALTURAPISO, ps_predio, 
-        #                            ps_volteor, matConexionVertices_ss, vecVertices_ss, 
-        #                            ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
-        #                            ps_publico, ps_calles, ps_base, ps_baseSeparada);
+        fig = plotBaseEdificio3d_v2(fpe, resultados[cont].Xopt[1], dca.ALTURAPISO, ps_predio, 
+                                    ps_volteor, matConexionVertices_ss, vecVertices_ss, 
+                                    ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
+                                    ps_publico, ps_calles, ps_base, ps_baseSeparada);
 
         displayResults(resultados_)
         println(" ")
