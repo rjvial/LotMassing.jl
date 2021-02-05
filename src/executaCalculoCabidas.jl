@@ -102,7 +102,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         return -total_fit
     end
 
-    
+    numParticles = 4000# 2000;
+    maxIterations = 300# 300;
+
     resultados = fill(ResultadoCabida(nothing, nothing, nothing, nothing, nothing, nothing, []), length(conjuntoTemplates), 1)
     
     @time begin
@@ -135,8 +137,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2,t];
             ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2,t];
 
-            numParticles = 2000# 500;
-            maxIterations = 300# 100;
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
 
         elseif t == 2
@@ -150,8 +150,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, t];
             ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, t];       
 
-            numParticles = 2000# 500;
-            maxIterations = 300# 100;
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
             
         elseif t == 3
@@ -167,8 +165,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, t];
             ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, t];
 
-            numParticles = 2000# 2000;
-            maxIterations = 300# 300;
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
  
         end
