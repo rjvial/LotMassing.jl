@@ -4,7 +4,9 @@ authors = ["Raimundo Vial <rjvial@gmail.com> and contributors"]
 version = "0.1.0"
 
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76"
 Clipper = "c8f6d549-b3ab-5508-a0d1-48fe138e8cc1"
 Devices = "6fe4a0ef-4c35-4686-8fec-3c9b50203484"
