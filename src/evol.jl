@@ -1,17 +1,30 @@
 function evol(fitness, lb, ub, numParticles, maxiter, verbose)
 
-    method = DE(populationSize = numParticles, F = 0.9, K = 0.5*(0.9+1));
-    #method = CMAES(mu = 300, lambda = 1200)
-    bounds = Evolutionary.ConstraintBounds(lb,ub,[],[]);
-    #pop = Evolutionary.initial_population(method, bounds);
+    sr = [(lb[i], ub[i]) for i=1:length(lb)]
+    
+    fopt = 10000
+    xopt = []
+    for i=1:15
+        println(i)
+        result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
+                    Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 18000,
+                    TraceMode = :silent, NThreads=Threads.nthreads())
+        f_i = BlackBoxOptim.best_fitness(result)
+        if f_i < fopt
+            fopt = f_i
+            println(fopt)
+            xopt = BlackBoxOptim.best_candidate(result)
+        end
+    end
 
-    options = Evolutionary.Options(iterations=maxiter, show_trace = verbose)
-    result = Evolutionary.optimize(fitness, bounds, method, options)
-
-
-    xopt = Evolutionary.minimizer(result)
-    fopt = Evolutionary.minimum(result)
-
+    sr = [(xopt[i]-0.05*abs(xopt[i]), xopt[i]+0.05*abs(xopt[i])) for i=1:length(lb)]
+    sr[end] = (lb[end], lb[end])
+    
+    result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
+            Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 30000,
+            TraceMode = :silent, NThreads=Threads.nthreads())
+    fopt = BlackBoxOptim.best_fitness(result)
+    xopt = BlackBoxOptim.best_candidate(result)
 
     return xopt, fopt
 
