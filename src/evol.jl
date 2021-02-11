@@ -8,7 +8,7 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
         println(i)
         result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
                     Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 18000,
-                    TraceMode = :silent, NThreads=Threads.nthreads())
+                    TraceMode = :silent)
         f_i = BlackBoxOptim.best_fitness(result)
         if f_i < fopt
             fopt = f_i
@@ -22,7 +22,7 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
     
     result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
             Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 30000,
-            TraceMode = :silent, NThreads=Threads.nthreads())
+            TraceMode = :silent)
     fopt = BlackBoxOptim.best_fitness(result)
     xopt = BlackBoxOptim.best_candidate(result)
 

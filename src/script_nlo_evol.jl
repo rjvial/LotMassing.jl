@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, Random, CSV
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 1 #8 predio = 1,2,3,4,5,6,75,8
-conjuntoTemplates = [2] #4 [1:L, 2:C, 4:V]
+idPredio = 8 #8 predio = 1,2,3,4,5,6,75,8
+conjuntoTemplates = [4] #4 [1:L, 2:C, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
                      true,  # volTeor
