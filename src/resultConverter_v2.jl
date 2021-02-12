@@ -33,7 +33,8 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         p1_2 = [pos_x; pos_y];
         p2_2 = R2 * ([pos_x + anchoLado; pos_y] - cr2) + cr2;
         p3_2 = R2 * ([pos_x + anchoLado; pos_y + largo2] - cr2) + cr2;
-        p4_2 = R2 * ([pos_x; pos_y + largo2] - cr2) + cr2;    
+        p4_2 = R2 * ([pos_x; pos_y + largo2] - cr2) + cr2;
+        
         V1 = [p1_1';p2_1';p3_1';p4_1']
         V2 = [p1_2';p2_2';p3_2';p4_2'];        
 
