@@ -39,10 +39,8 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
 
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
-        psCorte = PolyShape([polyCorte_alt], 1)
 
         ps_base = polyShape.polyUnion_v2(ps1, ps2)
-        areaBasal = polyShape.polyArea_v2(ps_base)
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
     elseif template == 2
@@ -83,15 +81,55 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         ps0 = PolyShape([V0], 1)
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
-        psCorte = PolyShape([polyCorte_alt], 1)
 
         ps_base = polyShape.polyUnion_v2(ps0, ps1)
         ps_base = polyShape.polyUnion_v2(ps_base, ps2)
-        areaBasal = polyShape.polyArea_v2(ps_base)
         ps_baseSeparada = PolyShape([V0, V1, V2], 3)
 
     elseif template == 3
-        
+
+        pos_x = x[3]
+        pos_y = x[4]
+        unidades = Int(round(x[5]))
+        largo = x[6] 
+        var = x[7]
+        sep = x[8] 
+
+        R = poly2D.rotationMatrix(theta);
+        cr = [pos_x; pos_y]
+
+        ps = PolyShape([],1)
+        VV = []
+        for k = 1:unidades
+            if k == 1
+                p1 = [pos_x; pos_y];
+                p2 = R * ([pos_x + anchoLado; pos_y] - cr) + cr;
+                p3 = R * ([pos_x + anchoLado; pos_y + largo] - cr) + cr;
+                p4 = R * ([pos_x ; pos_y + largo] - cr) + cr;
+
+                VV = [[p1';p2';p3';p4']]
+                ps = PolyShape(VV, 1)
+
+            else
+                pos_x_k = pos_x + (anchoLado + sep)*(k-1)
+                pos_y_k = pos_y
+                largo_k = largo + var*(k-1)
+                p1_k = R * ([pos_x_k; pos_y_k] - cr) + cr;
+                p2_k = R * ([pos_x_k + anchoLado; pos_y_k] - cr) + cr;
+                p3_k = R * ([pos_x_k + anchoLado; pos_y_k + largo_k] - cr) + cr;
+                p4_k = R * ([pos_x_k ; pos_y_k + largo_k] - cr) + cr;
+
+                V_k = [p1_k';p2_k';p3_k';p4_k']
+                ps_k = PolyShape([V_k], 1)
+                ps = polyShape.polyUnion_v2(ps, ps_k)
+
+                push!(VV, V_k)
+
+            end    
+            
+        end
+        ps_base = ps
+        ps_baseSeparada = PolyShape(VV, unidades)
 
     elseif template == 4
 
@@ -119,15 +157,14 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
     
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
-        psCorte = PolyShape([polyCorte_alt], 1)
-    
-    
+        
         ps_base = polyShape.polyUnion_v2(ps1, ps2)
-        areaBasal = polyShape.polyArea_v2(ps_base)
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
      
     end
+    areaBasal = polyShape.polyArea_v2(ps_base)
+    psCorte = PolyShape([polyCorte_alt], 1)
 
     return alt, areaBasal, ps_base, ps_baseSeparada, psCorte
 

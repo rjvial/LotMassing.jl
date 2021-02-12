@@ -90,29 +90,21 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         cont += 1
 
         display("Inicio de Cálculo")
-        min_alt = min(maximum(vecAlturas_cs), dcn.RASANTE * dcn.SEPMIN)
-        max_alt = maximum(vecAlturas_cs)
-        min_theta = -pi;
-        max_theta =  pi;
+        min_alt = min(maximum(vecAlturas_cs), dcn.RASANTE * dcn.SEPMIN); max_alt = maximum(vecAlturas_cs)
+        min_theta = -pi; max_theta =  pi;
 
-        min_largo = anchoLado;
-        max_largo = 100;
-        min_largo1 = anchoLado;
-        max_largo1 = 100;
-        min_largo2 = anchoLado;
-        max_largo2 = 100;
+        min_largo = anchoLado; max_largo = 100; 
+        min_largo1 = anchoLado; max_largo1 = 100;
+        min_largo2 = anchoLado; max_largo2 = 100;
 
         xmin = minimum(V_areaEdif[:,1]);  xmax = maximum(V_areaEdif[:,1]);
         ymin = minimum(V_areaEdif[:,2]);  ymax = maximum(V_areaEdif[:,2]);
 
         if t == 1
-            min_alfa = 0;
-            max_alfa = pi / 2;
+            min_alfa = 0; max_alfa = pi / 2;
 
             lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2,t];
             ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2,t];
-
-            xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
 
         elseif t == 2
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
@@ -124,24 +116,27 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, t];
             ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, t];       
-
-            xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
                        
+        elseif t == 3
+            min_unidades = .5001; max_unidades = 5.4999;
+            min_var = -50; max_var = 50;
+            min_sep = anchoLado; max_sep = 100; 
+
+            lb = [min_alt, min_theta, xmin, ymin, min_unidades, min_largo, min_var, min_sep,t];
+            ub = [max_alt, max_theta, xmax, ymax, max_unidades, max_largo, max_var, max_sep,t];
 
         elseif t == 4
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
             maxDiagonal = maximum(largosDiag)
 
-            min_alfa = 0;
-            max_alfa =  pi / 2;
+            min_alfa = 0; max_alfa = pi / 2;
 
             lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, t];
             ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, t];
-
-            xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
  
         end
-            
+        
+        xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
         
         alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(xopt_cs, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
