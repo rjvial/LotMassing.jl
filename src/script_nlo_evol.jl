@@ -294,7 +294,7 @@ elseif idPredio == 9
     x = x[2:end]
     y = y[2:end]
     V = [x y]
-    factorCorreccion = ajusteArea(V, areaSup)
+    factorCorreccion = factorIgualaArea(V, areaSup)
     x = factorCorreccion * x
     y = factorCorreccion * y
     

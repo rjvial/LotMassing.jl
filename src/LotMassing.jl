@@ -344,9 +344,6 @@ export MATCELDASCONF_, MATCONFHOR_
 include("generaMatCeldasConf.jl")
 include("infoPredio.jl")
 include("calculaAnguloRotacion.jl")
-include("nonconv2sumofconv_v2.jl")
-include("ismembern.jl")
-include("pso.jl")
 include("plotCabidaOptima.jl")
 include("generaCalles.jl")
 include("generaSombraEdificio.jl")
@@ -360,14 +357,13 @@ include("resultConverter_v2.jl")
 include("executaCalculoCabidas.jl")
 include("generaVol3d_v4.jl")
 include("generaSombraTeor_v3.jl")
-include("randomPointsNearVertices.jl")
-include("ajusteArea.jl")
+include("factorIgualaArea.jl")
 include("generaSupBruta.jl")
 include("generaSitiosAleatorios.jl")
 
-export generaMatCeldasConf, infoPredio, calculaAnguloRotacion, ismembern, plotCabidaOptima,  
-       pso, generaCalles, generaSombraEdificio, optiEdificio,  displayResults, evol, poly2D, polyShape, 
-       nonconv2sumofconv_v2, resultConverter_v2, plotBaseEdificio3d_v2,
-       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, randomPointsNearVertices, 
-       ajusteArea, generaSupBruta, generaSitiosAleatorios
+export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
+       generaCalles, generaSombraEdificio, optiEdificio,  displayResults, evol, poly2D, polyShape, 
+       resultConverter_v2, plotBaseEdificio3d_v2, 
+       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, 
+       generaSupBruta, generaSitiosAleatorios, factorIgualaArea
 end

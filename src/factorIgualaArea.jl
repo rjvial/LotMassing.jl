@@ -1,4 +1,4 @@
-function ajusteArea(V, areaSup)
+function factorIgualaArea(V, areaSup)
 
     fmin = 90000
     fmax = 110000
