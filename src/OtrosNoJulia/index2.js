@@ -1,5 +1,4 @@
-// mapboxgl.accessToken = 'sk.eyJ1IjoicnZpYWwiLCJhIjoiY2toZjJla3g2MDNqdDJxcWQzajR3bWNvZiJ9.QbSuiiqZFY9maaQBipL8jg';
-mapboxgl.accessToken = 'pk.eyJ1IjoicnZpYWwiLCJhIjoiY2tjeTZ2MWdkMDF3ajMxcG1la3ZoY3cyNiJ9.sCVIT6WJAC8_TuAh0AfFTw';
+mapboxgl.accessToken = 'poner aquí el pin';
 
 var map = new mapboxgl.Map({
     container: 'before',
