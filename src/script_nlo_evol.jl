@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, Random, CSV
+using LotMassing, .poly2D, .polyShape, CSV
 
 #Random.seed!(1236)
 #Random.seed!(1230)

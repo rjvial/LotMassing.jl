@@ -82,7 +82,7 @@ end
 function expandPolygon(V, dist)
     numVertices = size(V,1)
     poly = Devices.Polygon([Devices.Point(V[i,1],V[i,2]) for i=1:numVertices])
-    poly_ = offset(poly, dist)
+    poly_ = Devices.offset(poly, dist)
     
     poly__ = poly_[1].p
     numVertices_ = size(poly__,1)

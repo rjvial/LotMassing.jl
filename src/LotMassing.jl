@@ -1,6 +1,6 @@
 module LotMassing
 
-using NPFinancial, JuMP, GAMS, Polyhedra, BlackBoxOptim #, Cbc
+using NPFinancial, JuMP, GAMS, Polyhedra, BlackBoxOptim, Random #, Cbc
 
 
 
@@ -363,10 +363,11 @@ include("generaSombraTeor_v3.jl")
 include("randomPointsNearVertices.jl")
 include("ajusteArea.jl")
 include("generaSupBruta.jl")
+include("generaSitiosAleatorios.jl")
 
 export generaMatCeldasConf, infoPredio, calculaAnguloRotacion, ismembern, plotCabidaOptima,  
-       pso, generaCalles, generaSombraEdificio,
-       optiEdificio,  displayResults, evol, poly2D, polyShape, 
+       pso, generaCalles, generaSombraEdificio, optiEdificio,  displayResults, evol, poly2D, polyShape, 
        nonconv2sumofconv_v2, resultConverter_v2, plotBaseEdificio3d_v2,
-       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, randomPointsNearVertices, ajusteArea, generaSupBruta
+       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, randomPointsNearVertices, 
+       ajusteArea, generaSupBruta, generaSitiosAleatorios
 end

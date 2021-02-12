@@ -5,6 +5,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
     # Posiciona el origen del predio (esq. inferior izquierda) en el punto 0,0. Obtiene estructura con las matrices de rotación
     V_predio, R = infoPredio(dcp.x, dcp.y);
+    ps_predio = PolyShape([V_predio], 1)
+    superficieTerreno = polyShape.polyArea_v2(ps_predio);
        
 
     # Calcula matriz V_areaEdif asociada a los vértices del area de edificación
@@ -24,21 +26,15 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     ps_areaEdif = polyShape.polyExpandSides_v2(ps_areaEdif, -ones(length(conjuntoLadosCalle),1)*antejardin, conjuntoLadosCalle)
     V_areaEdif = ps_areaEdif.Vertices[1] 
 
-    ps_predio = PolyShape([V_predio], 1)
-    superficieTerreno = polyShape.polyArea_v2(ps_predio);
     ps_bruto, ps_publico = generaSupBruta(ps_predio, conjuntoLadosCalle, anchoEspacioPublico)
+    superficieTerrenoBruta = polyShape.polyArea_v2(ps_bruto);
     ps_calles = generaCalles(ps_predio, ps_publico, anchoEspacioPublico)
     V_bruto = ps_bruto.Vertices[1]
     V_publico = ps_publico.Vertices[1]
 
-    # global altCorteVecinos, areaSombra_p, areaSombra_o, areaSombra_s
-    ps_bruto = PolyShape([V_bruto], 1)
-    superficieTerrenoBruta = polyShape.polyArea_v2(ps_bruto);
-    ps_publico = PolyShape([V_publico], 1)
-    ps_areaEdif = PolyShape([V_areaEdif], 1)    
 
     # Calcula el volumen y sombra teórica 
-    rasante_ss = dcn.RASANTE; 
+    rasante_ss = rasante; 
     matConexionVertices_ss, vecVertices_ss, ps_volteor = generaVol3d_v4(V_predio, V_bruto, rasante_ss, dcn, dcp)
     V_volteor = ps_volteor.Vertices[1]
     ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor_v3(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
@@ -46,31 +42,13 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     matConexionVertices_cs, vecVertices_cs, ps_restSombra = generaVol3d_v4(V_predio, V_bruto, rasante_cs, dcn, dcp)
     V_restSombra = ps_restSombra.Vertices[1]
 
-
     areaSombra_p = polyShape.polyArea_v2(ps_SombraVolTeor_p)
     areaSombra_o = polyShape.polyArea_v2(ps_SombraVolTeor_o)
     areaSombra_s = polyShape.polyArea_v2(ps_SombraVolTeor_s)
 
-    vecAlturas_ss = sort(unique(V_volteor[:,end]))
     vecAlturas_cs = sort(unique(V_restSombra[:,end]))
     altCorteVecinos = dcn.RASANTE * dcn.SEPMIN
     numVertices = size(V_areaEdif, 1);
-
-
-    function fitness_ss(x)  # Función de Fitness Sin Sombra
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(x, V_restSombra, anchoLado, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs)
-        
-        total_fit = 0
-
-        ps_r = polyShape.polyDifference_v3(ps_base, psCorte) #Sector de la base del edificio que sobrepasa el areaEdif
-        area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
-        penalizacion_r = area_r^1.1
-        penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
-
-        total_fit = alt*(areaBasal - 5*(penalizacionCoefOcup + penalizacion_r))
-
-        return -total_fit
-    end
 
 
     function fitness_cs(x)  # Función de Fitness Con Sombra
@@ -93,9 +71,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
-        #V_ch = poly2D.convHull(ps_base.Vertices[1])
-        #area_ch = poly2D.polyArea(V_ch)
-
         total_fit = alt*(areaBasal - 5*(penalizacion_r + penalizacionCoefOcup + penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
 
 
@@ -115,8 +90,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         cont += 1
 
         display("Inicio de Cálculo")
-        min_alt = min(maximum(vecAlturas_ss), dcn.RASANTE * dcn.SEPMIN)
-        max_alt = maximum(vecAlturas_ss)
+        min_alt = min(maximum(vecAlturas_cs), dcn.RASANTE * dcn.SEPMIN)
+        max_alt = maximum(vecAlturas_cs)
         min_theta = -pi;
         max_theta =  pi;
 
@@ -151,9 +126,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, t];       
 
             xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
-            
-        elseif t == 3
-            
+                       
 
         elseif t == 4
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
