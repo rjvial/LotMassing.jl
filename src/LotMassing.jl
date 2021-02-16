@@ -360,10 +360,11 @@ include("generaSombraTeor_v3.jl")
 include("factorIgualaArea.jl")
 include("generaSupBruta.jl")
 include("generaSitiosAleatorios.jl")
+include("ajusteArea.jl")
 
 export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
-       generaCalles, generaSombraEdificio, optiEdificio,  displayResults, evol, poly2D, polyShape, 
-       resultConverter_v2, plotBaseEdificio3d_v2, 
+       generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
+       resultConverter_v2, plotBaseEdificio3d_v2, ajusteArea,
        executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, 
        generaSupBruta, generaSitiosAleatorios, factorIgualaArea
 end

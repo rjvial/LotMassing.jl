@@ -1,4 +1,4 @@
-function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, vecAlturas)
+function resultConverter_v2(x, V, matConexionVertices, vecVertices, vecAlturas, sepNaves)
 
     template = Int(x[end])
     alt = min(x[1], maximum(vecAlturas))
@@ -20,7 +20,8 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         pos_x = x[4]
         pos_y = x[5]
         largo1 = x[6] 
-        largo2 = x[7] 
+        largo2 = x[7]
+        anchoLado = x[8]
 
         R1 = poly2D.rotationMatrix(theta);
         cr1 = [pos_x; pos_y]
@@ -49,9 +50,10 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         phi2 = x[4]
         pos_x0 = x[5]
         pos_y0 = x[6]
-        largo0 = x[7]
+        largo0 = max(x[7], sepNaves + 2*x[10])
         largo1 = x[8] 
         largo2 = x[9] 
+        anchoLado = x[10]
 
         R_theta = poly2D.rotationMatrix(theta);
         cr_theta  = [pos_x0; pos_y0];
@@ -94,7 +96,8 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         unidades = Int(round(x[5]))
         largo = x[6] 
         var = x[7]
-        sep = x[8] 
+        sep = x[8]
+        anchoLado = x[9]
 
         R = poly2D.rotationMatrix(theta);
         cr = [pos_x; pos_y]
@@ -139,7 +142,8 @@ function resultConverter_v2(x, V, anchoLado, matConexionVertices, vecVertices, v
         pos_y = x[5]
     
         largo1 = x[6] # 
-        largo2 = x[7] # 
+        largo2 = x[7] #
+        anchoLado = x[8] 
     
         R1 = poly2D.rotationMatrix(theta);
         cr1 = [pos_x; pos_y]
