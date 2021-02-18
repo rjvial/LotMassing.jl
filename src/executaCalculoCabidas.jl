@@ -71,7 +71,11 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
 
-        total_fit = alt*(areaBasal - 5*(penalizacion_r + penalizacionCoefOcup + penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
+        numPisos = Int(floor(alt / dca.ALTURAPISO)) 
+        maxSupConstruida = superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) * (1 + dca.PORCSUPCOMUN)
+        penalizacionConstructibilidad = max(0, areaBasal*numPisos - maxSupConstruida)
+
+        total_fit = numPisos*(areaBasal - 100*(penalizacion_r + penalizacionCoefOcup + penalizacionConstructibilidad + penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
 
 
         return -total_fit

@@ -202,6 +202,7 @@ struct salidaArquitectonica
     superficieUtilSNT
     superficieComunSNT
     superficieEdificadaSNT
+    superficieNoUtilizada
     superficiePorPiso
     estacionamientosVendibles
     estacionamientosVisita

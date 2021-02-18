@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, CSV
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 8 #8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [4] #4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 1 #8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [2] #4 [1:L, 2:C, 3:lll, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
                      true,  # volTeor
@@ -134,6 +134,9 @@ dcr = datosCabidaRentabilidad(1.20) # RetornoExigido
      
 
 if idPredio == 1
+    dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
+    dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
+
     factorCorreccion = 2;
     x = factorCorreccion * [0 30 40 45 10]';
     y = factorCorreccion * [10 0 15 35 30]';

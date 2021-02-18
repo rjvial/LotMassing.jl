@@ -1,9 +1,10 @@
-function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaPso, ps_base, superficieTerreno, superficieTerrenoBruta)
+function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
 
     areaBasalPso = polyShape.polyArea_v2(ps_base)
     numTiposDepto = length(dcc.SUPDEPTOUTIL);
     superficieDensidad = dcn.FLAGDENSIDADBRUTA ? superficieTerrenoBruta : superficieTerreno
     maxDeptos = dcn.DENSIDADMAX / 4 * superficieDensidad / 10000;
+    numPisosMaxVol = Int(floor(alturaEdif / dca.ALTURAPISO))
     
 
     ##############################################
@@ -66,6 +67,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaPso, ps_base, sup
     superficieComun = dca.PORCSUPCOMUN * superficieUtil;
     superficieLosaSNT = superficieVendible + superficieComun;
     superficieLosaBNT = dcn.SUPPORESTACIONAMIENTO * estacionamientosVendibles;
+    superficieLosaNoUtilizada = numPisosMaxVol*areaBasalPso - superficieLosaSNT;
 
     # Cálculo de Ingresos por Ventas
     ingresosVentaDeptos = sum(superficieVendibleDepto .* dcc.PRECIOVENTA);
@@ -120,7 +122,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaPso, ps_base, sup
 
     @constraints(m, begin
     # Restricción de Altura Máxima y Área Basal Máxima (Coeficiente de Ocupación)
-        numPisos * dca.ALTURAPISO <= alturaPso
+        numPisos * dca.ALTURAPISO <= alturaEdif
         
     # Restricciones que establecen relaciones entre areaBasal, numDeptos, largo y ancho
         superficieLosaSNT <= areaBasalPso * numPisos
@@ -216,6 +218,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaPso, ps_base, sup
             JuMP.value(superficieVendible), # superficieUtilSNT
             JuMP.value(superficieComun), # superficieComunSNT
             JuMP.value(superficieVendible) + JuMP.value(superficieComun), # superficieEdificadaSNT
+            JuMP.value(superficieLosaNoUtilizada), # superficieNoUtilizada  
             areaBasalPso, # superficiePorPiso
             JuMP.value(estacionamientosVendibles), # estacionamientosVendibles
             JuMP.value(estacionamientosVisitas), # estacionamientosVisita
