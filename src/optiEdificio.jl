@@ -67,7 +67,6 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     superficieComun = dca.PORCSUPCOMUN * superficieUtil;
     superficieLosaSNT = superficieVendible + superficieComun;
     superficieLosaBNT = dcn.SUPPORESTACIONAMIENTO * estacionamientosVendibles;
-    superficieLosaNoUtilizada = numPisosMaxVol*areaBasalPso - superficieLosaSNT;
 
     # Cálculo de Ingresos por Ventas
     ingresosVentaDeptos = sum(superficieVendibleDepto .* dcc.PRECIOVENTA);
@@ -122,20 +121,20 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
 
     @constraints(m, begin
     # Restricción de Altura Máxima y Área Basal Máxima (Coeficiente de Ocupación)
-        numPisos * dca.ALTURAPISO <= alturaEdif
+        maxAltura, numPisos * dca.ALTURAPISO <= alturaEdif
         
     # Restricciones que establecen relaciones entre areaBasal, numDeptos, largo y ancho
         superficieLosaSNT <= areaBasalPso * numPisos
-        maxCoefConstructibilidad, superficieUtil <= superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS)
+        maxConstructibilidad, superficieUtil <= superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS)
 
     # Restricciones de Rentabilidad Mínima
-        restRentabilidadMin, IngresosVentas >= dcr.RetornoExigido * CostoTotal
+        minRentabilidad, IngresosVentas >= dcr.RetornoExigido * CostoTotal
 
     # Restricción Suma de Departamentos menor a Máximo Número de Departamentos
-        RestDensidadMax, sum(numDeptosTipo) <= maxDeptos
+        maxDensidad, sum(numDeptosTipo) <= maxDeptos
 
     # Restricciones de Demanda
-        RestDemanda, numDeptosTipo .<= maxDeptos .* dcc.MAXPORCTIPODEPTO
+        maxDemanda, numDeptosTipo .<= maxDeptos .* dcc.MAXPORCTIPODEPTO
 
 
     end)
@@ -218,7 +217,6 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             JuMP.value(superficieVendible), # superficieUtilSNT
             JuMP.value(superficieComun), # superficieComunSNT
             JuMP.value(superficieVendible) + JuMP.value(superficieComun), # superficieEdificadaSNT
-            JuMP.value(superficieLosaNoUtilizada), # superficieNoUtilizada  
             areaBasalPso, # superficiePorPiso
             JuMP.value(estacionamientosVendibles), # estacionamientosVendibles
             JuMP.value(estacionamientosVisitas), # estacionamientosVisita
@@ -247,6 +245,11 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             JuMP.value(CostoUnitTerreno * superficieTerreno * dcu.ComisionCorredor), # CostoCorredor
             JuMP.value(CostoTerreno), # costoTerreno
             JuMP.value(CostoTerreno) / superficieTerreno # costoUnitTerreno
+        )
+
+        so = salidaOptimizacion(
+            superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) - JuMP.value(superficieUtil), # dualMaxConstructibilidad
+            maxDeptos - sum(JuMP.value.(numDeptosTipo)), # dualMaxDensidad
         )
 
         sm = salidaMonetaria( 
@@ -300,7 +303,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
         sf = nothing
     end
 
-    return sn, sa, si, st, sm, sf, status  
+    return sn, sa, si, st, so, sm, sf, status  
 
 
 

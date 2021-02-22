@@ -202,7 +202,6 @@ struct salidaArquitectonica
     superficieUtilSNT
     superficieComunSNT
     superficieEdificadaSNT
-    superficieNoUtilizada
     superficiePorPiso
     estacionamientosVendibles
     estacionamientosVisita
@@ -220,6 +219,12 @@ struct salidaTerreno
     costoTerreno
     costoUnitTerreno
 end
+
+struct salidaOptimizacion
+    dualMaxConstructibilidad
+    dualMaxDensidad
+end
+
 
 struct salidaIndicadores
     IngresosVentas
@@ -288,7 +293,7 @@ end
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
          datosCabidaFlujo, datosCabidaRentabilidad, RotInfo, SubPoly, PolyData, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
-         salidaTerreno, salidaNormativa, salidaFlujoCaja, salidaGeometria, PolyShape, FlagPlotEdif3D, ConstraintData,
+         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, salidaGeometria, PolyShape, FlagPlotEdif3D, ConstraintData,
          ResultadoCabida
 
 struct particulaPso

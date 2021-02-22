@@ -4,14 +4,15 @@ function displayResults(resultados)
     sa = resultados[2]
     si = resultados[3]
     st = resultados[4]
-    sm = resultados[5]
-    sf = resultados[6]
+    so = resultados[5]
+    sm = resultados[6]
+    sf = resultados[7]
     
-    displayResults(sn, sa, si, st, sm, sf)
+    displayResults(sn, sa, si, st, so, sm, sf)
 end
 
 
-function displayResults(sn, sa, si, st, sm, sf)
+function displayResults(sn, sa, si, st, so, sm, sf)
 
     println("Características Generales de la Cabida Óptima:")
     println("----------------------------------------------")
@@ -24,13 +25,18 @@ function displayResults(sn, sa, si, st, sm, sf)
     println("Superficie Útil SNT: ", round(sa.superficieUtilSNT, digits = 2), " m2")
     println("Superficie Común SNT: ", round(sa.superficieComunSNT, digits = 2), " m2")
     println("Superficie Edificada SNT: ", round(sa.superficieEdificadaSNT, digits = 2), " m2")
-    println("Superficie No Utilizada SNT: ", round(sa.superficieNoUtilizada, digits = 2), " m2")
     println("Superficie por Piso: ", round(sa.superficiePorPiso, digits = 2))
     println("N° Estac. Vendibles: ", round(Int, sa.estacionamientosVendibles))
     println("N° Estac. Visita: ", round(Int, sa.estacionamientosVisita))
     println("N° Estac. Discapacitados: ", round(Int, sn.minEstacionamientosDiscapacitados))
     println("N° Estac. Totales: ", round(Int, sa.estacionamientosVendibles) + round(Int, sa.estacionamientosVisita) + round(Int, sn.minEstacionamientosDiscapacitados))
     println("N° Estac. Bicicletas: ", round(Int, sa.numBicicleteros))
+
+    println("")
+    println(" Análisis de Holguras:")
+    println("----------------------------------------------")
+    println(" Rest. Constructibilidad Máxima: ", floor(so.dualMaxConstructibilidad), " m2")
+    println(" Rest. Densidad Máxima: ", floor(so.dualMaxDensidad), " m2")
 
     println("")
     println("Características del Terreno:")

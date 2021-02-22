@@ -4,7 +4,7 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
     
     fopt = 10000
     xopt = []
-    for i=1:15
+    for i=1:1#15
         display(i)
         result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
                     Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 18000,

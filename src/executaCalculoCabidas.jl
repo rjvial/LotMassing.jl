@@ -50,6 +50,11 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     numVertices = size(V_areaEdif, 1);
     sepNaves = dca.ANCHOMAX
 
+    maxSupConstruida = superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) * (1 + dca.PORCSUPCOMUN)
+
+    superficieDensidad = dcn.FLAGDENSIDADBRUTA ? superficieTerrenoBruta : superficieTerreno
+    maxDeptos = dcn.DENSIDADMAX / 4 * superficieDensidad / 10000;
+    maxSupConstruidaDensidad = maxDeptos*maximum(dcc.SUPDEPTOUTIL) * (1 + dca.PORCSUPCOMUN)
 
     function fitness_cs(x)  # Función de Fitness Con Sombra
 
@@ -68,14 +73,16 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         ps_r = polyShape.polyDifference_v3(ps_base, psCorte) #Sector de la base del edificio que sobrepasa el areaEdif
         area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
         penalizacion_r = area_r^1.1
-
         penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)
-
         numPisos = Int(floor(alt / dca.ALTURAPISO)) 
-        maxSupConstruida = superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) * (1 + dca.PORCSUPCOMUN)
         penalizacionConstructibilidad = max(0, areaBasal*numPisos - maxSupConstruida)
+        penalizacionDensidad = max(0, areaBasal*numPisos - maxSupConstruidaDensidad)
 
-        total_fit = numPisos*(areaBasal - 100*(penalizacion_r + penalizacionCoefOcup + penalizacionConstructibilidad + penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s))
+        penalizacionNumPisos = numPisos
+
+        total_fit = numPisos*(areaBasal - 100*(penalizacion_r + penalizacionCoefOcup + penalizacionConstructibilidad + penalizacionDensidad +
+                                penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
+                                0.5*penalizacionNumPisos )
 
 
         return -total_fit
@@ -146,11 +153,11 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(xopt_cs, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
         alturaEdif = numPisos * dca.ALTURAPISO
-        sn, sa, si, st, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
+        sn, sa, si, st, so, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
         xopt_cs[1] = sa.altura 
         numPisos = sa.numPisos
         resultados[cont] = ResultadoCabida(sn, sa, si, st, sm, sf, [xopt_cs])
-        resultados_ = [sn, sa, si, st, sm, sf, [xopt_cs]]
+        resultados_ = [sn, sa, si, st, so, sm, sf, [xopt_cs]]
 
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
         
