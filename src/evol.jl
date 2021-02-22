@@ -4,10 +4,10 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
     
     fopt = 10000
     xopt = []
-    for i=1:2
+    for i=1:15
         display(i)
         result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
-                    Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 15000,
+                    Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 18000,
                     TraceMode = :silent, NThreads=Threads.nthreads())
         f_i = BlackBoxOptim.best_fitness(result)
         if f_i < fopt

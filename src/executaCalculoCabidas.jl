@@ -81,7 +81,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         penalizacionNumPisos = numPisos
 
         total_fit = numPisos*(areaBasal - 100*(penalizacion_r + penalizacionCoefOcup + penalizacionConstructibilidad + penalizacionDensidad +
-                                penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) - 20*penalizacionNumPisos )
+                                penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) - 2*penalizacionNumPisos )
 
 
         return -total_fit
