@@ -221,6 +221,7 @@ struct salidaTerreno
 end
 
 struct salidaOptimizacion
+    dualMaxOcupación
     dualMaxConstructibilidad
     dualMaxDensidad
 end
@@ -355,14 +356,14 @@ include("generaCalles.jl")
 include("generaSombraEdificio.jl")
 include("optiEdificio.jl")
 include("displayResults.jl")
-include("plotBaseEdificio3d_v2.jl")
+include("plotBaseEdificio3d.jl")
 include("poly2D.jl")
 include("polyShape.jl")
 include("evol.jl")
-include("resultConverter_v2.jl")
+include("resultConverter.jl")
 include("executaCalculoCabidas.jl")
-include("generaVol3d_v4.jl")
-include("generaSombraTeor_v3.jl")
+include("generaVol3d.jl")
+include("generaSombraTeor.jl")
 include("factorIgualaArea.jl")
 include("generaSupBruta.jl")
 include("generaSitiosAleatorios.jl")
@@ -370,7 +371,7 @@ include("ajusteArea.jl")
 
 export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
        generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
-       resultConverter_v2, plotBaseEdificio3d_v2, ajusteArea,
-       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, 
+       resultConverter, plotBaseEdificio3d, ajusteArea,
+       executaCalculoCabidas, generaVol3d, generaSombraTeor, 
        generaSupBruta, generaSitiosAleatorios, factorIgualaArea
 end

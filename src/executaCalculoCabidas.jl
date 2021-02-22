@@ -34,11 +34,11 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
     # Calcula el volumen y sombra teórica 
     rasante_ss = rasante; 
-    matConexionVertices_ss, vecVertices_ss, ps_volteor = generaVol3d_v4(V_predio, V_bruto, rasante_ss, dcn, dcp)
+    matConexionVertices_ss, vecVertices_ss, ps_volteor = generaVol3d(V_predio, V_bruto, rasante_ss, dcn, dcp)
     V_volteor = ps_volteor.Vertices[1]
-    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor_v3(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
+    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
     rasante_cs = 5;
-    matConexionVertices_cs, vecVertices_cs, ps_restSombra = generaVol3d_v4(V_predio, V_bruto, rasante_cs, dcn, dcp)
+    matConexionVertices_cs, vecVertices_cs, ps_restSombra = generaVol3d(V_predio, V_bruto, rasante_cs, dcn, dcp)
     V_restSombra = ps_restSombra.Vertices[1]
 
     areaSombra_p = polyShape.polyArea_v2(ps_SombraVolTeor_p)
@@ -58,7 +58,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
     function fitness_cs(x)  # Función de Fitness Con Sombra
 
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(x, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(x, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         
         total_fit = 0
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
@@ -81,8 +81,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         penalizacionNumPisos = numPisos
 
         total_fit = numPisos*(areaBasal - 100*(penalizacion_r + penalizacionCoefOcup + penalizacionConstructibilidad + penalizacionDensidad +
-                                penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
-                                0.5*penalizacionNumPisos )
+                                penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) - 20*penalizacionNumPisos )
 
 
         return -total_fit
@@ -150,7 +149,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         
         xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
         
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter_v2(xopt_cs, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_cs, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
         alturaEdif = numPisos * dca.ALTURAPISO
         sn, sa, si, st, so, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
@@ -161,7 +160,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
         
-        fig = plotBaseEdificio3d_v2(fpe, resultados[cont].Xopt[1], dca.ALTURAPISO, ps_predio, 
+        fig = plotBaseEdificio3d(fpe, resultados[cont].Xopt[1], dca.ALTURAPISO, ps_predio, 
                                     ps_volteor, matConexionVertices_ss, vecVertices_ss, 
                                     ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
                                     ps_publico, ps_calles, ps_base, ps_baseSeparada);

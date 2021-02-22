@@ -15,7 +15,7 @@ using LotMassing, .poly2D, .polyShape, CSV
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 3 #8 predio = 1,2,3,4,5,6,7,8
+idPredio = 2 #8 predio = 1,2,3,4,5,6,7,8
 conjuntoTemplates = [2] #4 [1:L, 2:C, 3:lll, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
@@ -55,7 +55,7 @@ dcn = datosCabidaNormativa(5, # SEPMIN (m): max(4, separación mínima deslindes
 dca = datosCabidaArquitectura(2.55, # 2.625, # ALTURAPISO (m / piso)
                          .2, # PORCSUPCOMUN (m2 / m2 útil)
                          .05, # PORCTERRAZA (m2 / m2 útil)
-                         8,#12, # ANCHOMAX (m) 
+                         15,#12, # ANCHOMAX (m) 
                          [], 
                          []
                          );

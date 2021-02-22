@@ -248,6 +248,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
         )
 
         so = salidaOptimizacion(
+            superficieTerreno * dcn.COEFOCUPACION - areaBasalPso,
             superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) - JuMP.value(superficieUtil), # dualMaxConstructibilidad
             maxDeptos - sum(JuMP.value.(numDeptosTipo)), # dualMaxDensidad
         )

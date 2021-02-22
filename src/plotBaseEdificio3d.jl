@@ -1,4 +1,4 @@
-function plotBaseEdificio3d_v2(fpe, x, alturaPiso, ps_predio,
+function plotBaseEdificio3d(fpe, x, alturaPiso, ps_predio,
                              ps_volteor, matConexionVertices_ss, vecVertices_ss, 
                             ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
                             ps_publico, ps_calles, ps_base, ps_baseSeparada)

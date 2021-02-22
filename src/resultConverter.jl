@@ -1,4 +1,4 @@
-function resultConverter_v2(x, V, matConexionVertices, vecVertices, vecAlturas, sepNaves)
+function resultConverter(x, V, matConexionVertices, vecVertices, vecAlturas, sepNaves)
 
     template = Int(x[end])
     alt = min(x[1], maximum(vecAlturas))
