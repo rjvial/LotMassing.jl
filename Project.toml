@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 BlackBoxOptim = "a134a8b2-14d6-55f6-9291-3336d3ab0209"
+CMAEvolutionStrategy = "8d3b24bd-414e-49e0-94fb-163cc3a3e411"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 Clipper = "c8f6d549-b3ab-5508-a0d1-48fe138e8cc1"
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"

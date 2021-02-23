@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, CSV
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 2 #8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [2] #4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 8 #8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [4] #4 [1:L, 2:C, 3:lll, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
                      true,  # volTeor
@@ -228,7 +228,7 @@ elseif idPredio == 8
     dcn.MAXPISOS = 40 # 9, #MAXPISOS (unidades)
     dcn.COEFOCUPACION = .4 # COEFOCUPACION (m2 / m2 de terreno)
     dcn.SUBPREDIALMIN = 1000 # SUBPREDIALMIN (m2)
-    dcn.DENSIDADMAX = 20000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
+    dcn.DENSIDADMAX = 2000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
     dcn.COEFCONSTRUCTIBILIDAD = 3.2 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
 
     dcc.SUPDEPTOUTIL = [20, 35, 45, 55] # SUPDEPTOUTIL (m2)
