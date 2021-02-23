@@ -828,9 +828,25 @@ function distPointLine(q, p1, p2)
     return dist
 end
 
+function pointAtDistFromLine(d, q, p1, p2)
+    # Calcula la posicion del punto a una distancia d del punto q y 
+    x1 = p1[1]; y1 = p1[2];
+    x2 = p2[1]; y2 = p2[2];
+    xq = q[1]; yq = q[2];
+
+    xp_1 = xq + d/sqrt(1+((x2-x1)/(y2-y1))^2)
+    yp_1 = yq - d*((x2-x1)/(y2-y1))/sqrt(1+((x2-x1)/(y2-y1))^2)
+    p_1 = [xp_1 yp_1]
+
+    xp_2 = xq - d/sqrt(1+((x2-x1)/(y2-y1))^2)
+    yp_2 = yq + d*((x2-x1)/(y2-y1))/sqrt(1+((x2-x1)/(y2-y1))^2)
+    p_2 = [xp_2 yp_2]
+
+    return p_1, p_2
+end
 
 export  checkConvex, verticesConvHull, convHull, createLine, distanceMat, expandPolygonSide, expandPolygonSides, inpoly, inpoly_mat,
         intersectEdges, intersectLines, intersectPoly2d, isPointInPolygon, isRectInPoly, lineAngle, parallelLine,
         pointOnLine, polyArea, randomPointInPolygon, rotationMatrix, vert2con, plotScatter3d, findNonConvexVert,
-        angulosLados, rectangle, distPointLine
+        angulosLados, rectangle, distPointLine, pointAtDistFromLine
 end

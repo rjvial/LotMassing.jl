@@ -80,9 +80,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         penalizacionNumPisos = numPisos
 
-        total_fit = numPisos*(areaBasal - 100*(penalizacion_r + penalizacionCoefOcup + penalizacionConstructibilidad + penalizacionDensidad +
-                                penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) - 2*penalizacionNumPisos )
-
+        total_fit = numPisos * (areaBasal - 100*penalizacionCoefOcup - 100*penalizacion_r) -
+                    1000*(penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
+                    numPisos * penalizacionNumPisos - 1000*(penalizacionConstructibilidad + penalizacionDensidad)
 
         return -total_fit
     end
@@ -124,7 +124,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             min_phi1 = 0; max_phi1 =  pi / 2;
             min_phi2 = 0; max_phi2 =  pi / 2;
             min_largo0 = 3 * sepNaves; max_largo0 = maxDiagonal
-
+    
             lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, min_ancho, t];
             ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, max_ancho, t];       
                        

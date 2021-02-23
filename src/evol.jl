@@ -6,9 +6,13 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
     xopt = []
     for i=1:15
         display(i)
-        result = BlackBoxOptim.bboptimize(fitness; SearchRange = sr, NumDimensions = length(lb),
-                    Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 18000,
-                    TraceMode = :silent, NThreads=Threads.nthreads())
+
+        opt = bbsetup(fitness; SearchRange = sr, NumDimensions = length(lb),
+        Method = :adaptive_de_rand_1_bin_radiuslimited, MaxSteps = 18000,
+        TraceMode = :silent)
+
+        result = BlackBoxOptim.bboptimize(opt)
+
         f_i = BlackBoxOptim.best_fitness(result)
         if f_i < fopt
             fopt = f_i
