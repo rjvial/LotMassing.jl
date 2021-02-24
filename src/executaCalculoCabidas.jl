@@ -117,8 +117,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         if t == 1
             min_alfa = 0; max_alfa = pi / 2;
 
-            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, min_ancho, t];
-            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, max_ancho, t];
+            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, max_ancho];
 
         elseif t == 2
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
@@ -136,8 +136,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             min_var = -50; max_var = 50;
             min_sep = sepNaves; max_sep = 100; 
 
-            lb = [min_alt, min_theta, xmin, ymin, min_unidades, min_largo, min_var, min_sep, min_ancho, t];
-            ub = [max_alt, max_theta, xmax, ymax, max_unidades, max_largo, max_var, max_sep, max_ancho, t];
+            lb = [min_alt, min_theta, xmin, ymin, min_unidades, min_largo, min_var, min_sep, min_ancho];
+            ub = [max_alt, max_theta, xmax, ymax, max_unidades, max_largo, max_var, max_sep, max_ancho];
 
         elseif t == 4
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
@@ -145,8 +145,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             min_alfa = 0; max_alfa = pi / 2;
 
-            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, min_ancho, t];
-            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, max_ancho, t];
+            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, max_ancho];
  
         end
         
