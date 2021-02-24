@@ -58,7 +58,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
     function fitness_cs(x)  # Función de Fitness Con Sombra
 
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(x, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(x, t, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         
         total_fit = 0
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
@@ -128,8 +128,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             min_phi2 = 0; max_phi2 =  pi / 2;
             min_largo0 = 3 * sepNaves; max_largo0 = maxDiagonal
     
-            lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, min_ancho, t];
-            ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, max_ancho, t];       
+            lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, max_ancho];       
                        
         elseif t == 3
             min_unidades = .5001; max_unidades = 5.4999;
@@ -152,7 +152,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         
         xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
         
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_cs, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_cs, t, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
         alturaEdif = numPisos * dca.ALTURAPISO
         sn, sa, si, st, so, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)

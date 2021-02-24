@@ -25,7 +25,6 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
     end
 
     sr = [(xopt[i] - 0.05 * abs(xopt[i]), xopt[i] + 0.05 * abs(xopt[i])) for i = 1:length(lb)]
-    sr[end] = (lb[end], lb[end])
     
     result = BlackBoxOptim.bboptimize(fitness; SearchRange=sr, NumDimensions=length(lb),
             Method=:adaptive_de_rand_1_bin_radiuslimited, MaxSteps=30000,
