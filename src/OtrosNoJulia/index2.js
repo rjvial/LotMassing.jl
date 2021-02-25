@@ -1,4 +1,4 @@
-mapboxgl.accessToken = 'poner aquí el pin';
+mapboxgl.accessToken = 'pin aqui';
 
 var map = new mapboxgl.Map({
     container: 'before',

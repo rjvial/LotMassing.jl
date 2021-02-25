@@ -44,9 +44,14 @@ function evol(fitness, lb, ub, numParticles, maxiter, verbose)
             CallbackFunction = callback_progress_stepper, 
             CallbackInterval = 0.0,
             TraceMode = :silent)
-    fopt = BlackBoxOptim.best_fitness(result)
-    xopt = BlackBoxOptim.best_candidate(result)
+    f_f = BlackBoxOptim.best_fitness(result)
+    x_f = BlackBoxOptim.best_candidate(result)
 
+    if f_f < fopt
+        fopt = f_f
+        xopt = x_f
+    end
+    
     return xopt, fopt
 
 end
