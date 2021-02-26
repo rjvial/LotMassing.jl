@@ -117,8 +117,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         if t == 1
             min_alfa = 0; max_alfa = pi / 2;
 
-            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, min_ancho];
-            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, max_ancho];
+            lb = [min_alt, min_theta, xmin, ymin, min_alfa, min_largo1, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, xmax, ymax, max_alfa, max_largo1, max_largo2, max_ancho];
 
         elseif t == 2
             largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
@@ -128,8 +128,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             min_phi2 = 0; max_phi2 =  pi / 2;
             min_largo0 = 3 * sepNaves; max_largo0 = maxDiagonal
     
-            lb = [min_alt, min_theta, min_phi1, min_phi2, xmin, ymin, min_largo0, min_largo1, min_largo2, min_ancho];
-            ub = [max_alt, max_theta, max_phi1, max_phi2, xmax, ymax, max_largo0, max_largo1, max_largo2, max_ancho];       
+            lb = [min_alt, min_theta, xmin, ymin, min_phi1, min_phi2, min_largo0, min_largo1, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, xmax, ymax, max_phi1, max_phi2, max_largo0, max_largo1, max_largo2, max_ancho];       
                        
         elseif t == 3
             min_unidades = .5001; max_unidades = 5.4999;
@@ -145,12 +145,25 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
             min_alfa = 0; max_alfa = pi / 2;
 
-            lb = [min_alt, min_theta, min_alfa, xmin, ymin, min_largo1, min_largo2, min_ancho];
-            ub = [max_alt, max_theta, max_alfa, xmax, ymax, max_largo1, max_largo2, max_ancho];
+            lb = [min_alt, min_theta, xmin, ymin, min_alfa, min_largo1, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, xmax, ymax, max_alfa, max_largo1, max_largo2, max_ancho];
  
         end
-        
-        xopt_cs, fopt_cs = evol(fitness_cs, lb, ub, numParticles, maxIterations, false)
+
+        MaxSteps = 18000
+        sr = [(lb[i], ub[i]) for i = 1:length(lb)]
+        fopt_cs = 10000
+        xopt_cs = []
+        h = 6
+        @showprogress 1 "Calculando Cabida..." for k = 1:2*h
+            sr[2] = (-pi + (k - 1) * pi / h, -pi / h + (k - 1) * pi / h)
+            x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, false)
+            if f_k < fopt_cs
+                fopt_cs = f_k
+                xopt_cs = x_k
+            end
+        end
+
         
         alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_cs, t, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         numPisos = Int(floor(alt / dca.ALTURAPISO))

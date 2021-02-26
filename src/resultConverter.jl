@@ -15,9 +15,9 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
 
     if template == 1
 
-        alfa = x[3]
-        pos_x = x[4]
-        pos_y = x[5]
+        pos_x = x[3]
+        pos_y = x[4]
+        alfa = x[5]
         largo1 = x[6] 
         largo2 = x[7]
         anchoLado = x[8]
@@ -45,10 +45,10 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
     elseif template == 2
-        phi1 = x[3]
-        phi2 = x[4]
-        pos_x0 = x[5]
-        pos_y0 = x[6]
+        pos_x0 = x[3]
+        pos_y0 = x[4]
+        phi1 = x[5]
+        phi2 = x[6]
         largo0 = max(x[7], sepNaves + 2*x[10])
         largo1 = x[8] 
         largo2 = x[9] 
@@ -136,10 +136,9 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
 
     elseif template == 4
 
-        alfa = x[3]
-        pos_x = x[4]
-        pos_y = x[5]
-    
+        pos_x = x[3]
+        pos_y = x[4]
+        alfa = x[5]    
         largo1 = x[6] # 
         largo2 = x[7] #
         anchoLado = x[8] 
