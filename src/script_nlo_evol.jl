@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, CSV
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 2 #8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [2] #4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 9 #8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [1] #4 [1:L, 2:C, 3:lll, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
                      true,  # volTeor
@@ -277,14 +277,14 @@ elseif idPredio == 9
     dcc.PRECIOVENTAEST = 350 # PRECIOVENTAEST (UF / unidad)
 
     dcu.LosaSNT = 30 # LosaSNT 
-    dcu.LosaBNT = 10 # LosaBNT 
+    dcu.LosaBNT = 12 # LosaBNT 
 
     dca.ANCHOMAX = 8 # Ancho Crujía (m)
     dca.ALTURAPISO = 2.7 # 2.625, # ALTURAPISO (m / piso)
     dca.PORCSUPCOMUN = .2 # PORCSUPCOMUN (m2 / m2 útil)
 
-    #nombreArchivo = "el_dante_2.csv"
-    nombreArchivo = "predio_ElDante.csv"
+    nombreArchivo = "el_dante_2.csv"
+    #nombreArchivo = "predio_ElDante.csv"
     loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1,numDatos)
@@ -301,8 +301,8 @@ elseif idPredio == 9
     x = factorCorreccion * x
     y = factorCorreccion * y
     
-#    dcp = datosCabidaPredio(x, y, [1,2,3], [15,15,15], 0, 200);
-    dcp = datosCabidaPredio(x, y, [1,2,3,4,5,6], [15,15,15,15,15,20], 0, 200);
+    dcp = datosCabidaPredio(x, y, [1,2,3], [15,15,15], 0, 200);
+#    dcp = datosCabidaPredio(x, y, [1,2,3,4,5,6], [15,15,15,15,15,20], 0, 200);
 
 end
 

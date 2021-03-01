@@ -6,6 +6,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     # Posiciona el origen del predio (esq. inferior izquierda) en el punto 0,0. Obtiene estructura con las matrices de rotación
     V_predio, R = infoPredio(dcp.x, dcp.y);
     ps_predio = PolyShape([V_predio], 1)
+    # Corrección por expropiación #
+    ps_predio = polyShape.polyExpandSides_v2(ps_predio, [-1.5, -1.5, -1.5], [1, 2, 3]) 
+    # #############################
     superficieTerreno = polyShape.polyArea_v2(ps_predio);
        
 
@@ -151,17 +154,28 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         end
 
         MaxSteps = 18000
+        MaxStepsWithoutProgress = 5000
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
         h = 6
-        @showprogress 1 "Calculando Cabida..." for k = 1:2*h
-            sr[2] = (-pi + (k - 1) * pi / h, -pi / h + (k - 1) * pi / h)
-            x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, false)
+        kopt = 0
+        @showprogress 1 "Calculando Cabida..." for k = 1:2*h+1
+            if k <= 2*h
+                lb[2] = -pi + (k - 1) * pi / h
+                ub[2] = -pi / h + (k - 1) * pi / h
+                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, MaxStepsWithoutProgress, false)
+            else
+                lb[2] = -pi + (kopt - 1) * pi / h
+                ub[2] = -pi / h + (kopt - 1) * pi / h
+                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps*2, MaxStepsWithoutProgress, false)
+            end
             if f_k < fopt_cs
                 fopt_cs = f_k
                 xopt_cs = x_k
+                kopt = k
             end
+
         end
 
         

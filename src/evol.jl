@@ -1,4 +1,4 @@
-function evol(fitness, lb, ub, MaxSteps, verbose)
+function evol(fitness, lb, ub, MaxSteps, MaxStepsWithoutProgress, verbose)
 
     # Minimum update interval 0.5 seconds
     Prog = ProgressMeter.Progress(MaxSteps, 0.5, "Final Optimization...")
@@ -14,7 +14,7 @@ function evol(fitness, lb, ub, MaxSteps, verbose)
             Method = :adaptive_de_rand_1_bin_radiuslimited, 
             #MaxFuncEvals = MaxFuncEvals,
             MaxSteps = MaxSteps,
-            MaxStepsWithoutProgress = 5000,
+            MaxStepsWithoutProgress = MaxStepsWithoutProgress,
             CallbackFunction = callback_progress_stepper, 
             CallbackInterval = 0.0,
             TraceMode = :silent)
@@ -22,7 +22,7 @@ function evol(fitness, lb, ub, MaxSteps, verbose)
         opt = bbsetup(fitness; 
             SearchRange = sr, 
             MaxSteps = MaxSteps,
-            MaxStepsWithoutProgress = 5000,
+            MaxStepsWithoutProgress = MaxStepsWithoutProgress,
             NumDimensions = length(lb),
             Method = :adaptive_de_rand_1_bin_radiuslimited, 
             TraceMode = :silent)
