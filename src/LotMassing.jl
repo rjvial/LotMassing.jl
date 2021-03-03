@@ -207,6 +207,9 @@ struct salidaArquitectonica
     estacionamientosVisita
     numEstacionamientos
     numBicicleteros
+    descuentoEstBicicletas
+    cambioEstBicicletas
+    descuentoEstCercaniaMetro
 end
 
 struct salidaTerreno
@@ -347,7 +350,6 @@ include("plotCabidaOptima.jl")
 include("generaCalles.jl")
 include("generaSombraEdificio.jl")
 include("optiEdificio.jl")
-include("optiEdificio_v2.jl")
 include("generaSalidaEntera.jl")
 include("displayResults.jl")
 include("plotBaseEdificio3d.jl")
@@ -364,7 +366,7 @@ include("generaSitiosAleatorios.jl")
 include("ajusteArea.jl")
 
 export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
-       generaCalles, generaSombraEdificio, optiEdificio, optiEdificio_v2, generaSalidaEntera, displayResults,  
+       generaCalles, generaSombraEdificio, optiEdificio, generaSalidaEntera, displayResults,  
        evol, poly2D, polyShape, resultConverter, plotBaseEdificio3d, ajusteArea,
        executaCalculoCabidas, generaVol3d, generaSombraTeor, 
        generaSupBruta, generaSitiosAleatorios, factorIgualaArea
