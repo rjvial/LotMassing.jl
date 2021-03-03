@@ -160,7 +160,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         xopt_cs = []
         h = 6
         kopt = 0
-        @showprogress 1 "Calculando Cabida..." for k = 1:2*h+1
+        @showprogress 1 "Calculando Cabida..." for k = 1:2#2*h+1
             if k <= 2*h
                 lb[2] = -pi + (k - 1) * pi / h
                 ub[2] = -pi / h + (k - 1) * pi / h
@@ -182,7 +182,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_cs, t, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
         alturaEdif = numPisos * dca.ALTURAPISO
-        sn, sa, si, st, so, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
+        sn, sa, si, st, so, sm, sf = optiEdificio_v2(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
         xopt_cs[1] = sa.altura 
         numPisos = sa.numPisos
         resultados[cont] = ResultadoCabida(sn, sa, si, st, sm, sf, [xopt_cs])

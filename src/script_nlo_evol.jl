@@ -43,7 +43,7 @@ dcn = datosCabidaNormativa(5, # SEPMIN (m): max(4, separación mínima deslindes
                      [.5, 1, 1, 1], # ESTACIONAMIENTOSPORVIV (unidades / departamento)
                      .15, # PORCADICESTACVISITAS (unidades / estacionamiento vendible)
                      34, # SUPPORESTACIONAMIENTO (m2 / Estacionamiento)
-                     .25, # ESTBICICLETAPORVIV (unidades / estacionamientos totales)
+                     .5, # ESTBICICLETAPORVIV (unidades / estacionamientos totales)
                      3, # BICICLETASPOREST 
                      true, # FLAGCAMBIOESTPORBICICLETA
                      10, # MAXSUBTE (unidades)
@@ -263,13 +263,13 @@ elseif idPredio == 9
     dcn.ANTEJARDIN = 7 # ANTEJARDIN (m) 
     dcn.ALTURAMAX = 52.5 #47 # 24, #ALTURAMAX (m)
     dcn.MAXPISOS = 15 # 9, #MAXPISOS (unidades)
-    dcn.COEFOCUPACION = .3 # COEFOCUPACION (m2 / m2 de terreno)
+    dcn.COEFOCUPACION = .3 # COEFOCUPACION (m2 de base / m2 de terreno)
     dcn.SUBPREDIALMIN = 1500 # SUBPREDIALMIN (m2)
     dcn.DENSIDADMAX = 880 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
     dcn.FLAGDENSIDADBRUTA = false # FLAGDENSIDADBRUTA
-    dcn.COEFCONSTRUCTIBILIDAD = 2.8 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
-    dcn.ESTACIONAMIENTOSPORVIV = [1, 2, 2, 2] # ESTACIONAMIENTOSPORVIV
-    dcn.FLAGCAMBIOESTPORBICICLETA = false # FLAGCAMBIOESTPORBICICLETA
+    dcn.COEFCONSTRUCTIBILIDAD = 2.8 # COEFCONSTRUCTIBILIDAD (m2 de Sup. Util/ m2 de terreno)
+    dcn.ESTACIONAMIENTOSPORVIV = [1.5, 1.5, 2, 2] # ESTACIONAMIENTOSPORVIV
+    dcn.FLAGCAMBIOESTPORBICICLETA = true # FLAGCAMBIOESTPORBICICLETA
 
     dcc.SUPDEPTOUTIL = [50, 90, 110, 140] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [95, 91, 89, 87] # PRECIOVENTA (UF / m2 vendible) 

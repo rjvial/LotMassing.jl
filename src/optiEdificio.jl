@@ -27,8 +27,8 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     @variables(m, begin
-        0 <= numPisos <= dcn.MAXPISOS
-        0 <= numDeptosTipo[u = 1:numTiposDepto]
+        0 <= numPisos <= dcn.MAXPISOS, Int
+        0 <= numDeptosTipo[u = 1:numTiposDepto], Int
         0 <= CostoUnitTerreno
     end)
 
@@ -51,10 +51,10 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     descuentoEstCercaniaMetro = estacionamientosNormales * 0.5*dcn.REDUCCIONESTPORDISTMETRO
     descuentoEstBicicletas = estacionamientosBicicletas/dcn.BICICLETASPOREST
     estacionamientosNormales = estacionamientosNormales - descuentoEstCercaniaMetro - descuentoEstBicicletas
-    cambioEstBicicletas = (dcn.FLAGCAMBIOESTPORBICICLETA) ? estacionamientosNormales / 3 : 0
+    cambioEstBicicletas = dcn.FLAGCAMBIOESTPORBICICLETA ? estacionamientosNormales / 3 : 0
     estacionamientosVendibles = estacionamientosViviendas - descuentoEstCercaniaMetro - descuentoEstBicicletas - cambioEstBicicletas
     estacionamientosBicicletas = estacionamientosBicicletas + cambioEstBicicletas * dcn.BICICLETASPOREST
-    estacionamientos = estacionamientosVendibles + estacionamientosVisitas + estacionamientosDiscapacitados + estacionamientosBicicletas / dcn.BICICLETASPOREST;
+    estacionamientos = estacionamientosVendibles + estacionamientosVisitas + estacionamientosBicicletas / dcn.BICICLETASPOREST;
     
 
     # Cálculo de Superficies
@@ -217,7 +217,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             JuMP.value(superficieVendible), # superficieUtilSNT
             JuMP.value(superficieComun), # superficieComunSNT
             JuMP.value(superficieVendible) + JuMP.value(superficieComun), # superficieEdificadaSNT
-            areaBasalPso, # superficiePorPiso
+            (JuMP.value(superficieVendible) + JuMP.value(superficieComun))/JuMP.value(numPisos), # superficiePorPiso
             JuMP.value(estacionamientosVendibles), # estacionamientosVendibles
             JuMP.value(estacionamientosVisitas), # estacionamientosVisita
             JuMP.value(estacionamientosVendibles) + JuMP.value(estacionamientosVisitas), # numEstacionamientos Totales

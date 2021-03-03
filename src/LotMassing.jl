@@ -337,14 +337,6 @@ MATCONFHOR_ = [[1 0 1];
                [0 NaN NaN]];
 
 
-"""
-MATCELDASCONF_ = [[1 3 5];
-                  [1 3 NaN];
-                  [1 NaN NaN]];
-MATCONFHOR_ = [[1 0 1];
-               [1 0 NaN];
-               [1 NaN NaN]];
-"""
 
 export MATCELDASCONF_, MATCONFHOR_
 
@@ -355,6 +347,8 @@ include("plotCabidaOptima.jl")
 include("generaCalles.jl")
 include("generaSombraEdificio.jl")
 include("optiEdificio.jl")
+include("optiEdificio_v2.jl")
+include("generaSalidaEntera.jl")
 include("displayResults.jl")
 include("plotBaseEdificio3d.jl")
 include("poly2D.jl")
@@ -370,8 +364,8 @@ include("generaSitiosAleatorios.jl")
 include("ajusteArea.jl")
 
 export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
-       generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
-       resultConverter, plotBaseEdificio3d, ajusteArea,
+       generaCalles, generaSombraEdificio, optiEdificio, optiEdificio_v2, generaSalidaEntera, displayResults,  
+       evol, poly2D, polyShape, resultConverter, plotBaseEdificio3d, ajusteArea,
        executaCalculoCabidas, generaVol3d, generaSombraTeor, 
        generaSupBruta, generaSitiosAleatorios, factorIgualaArea
 end
