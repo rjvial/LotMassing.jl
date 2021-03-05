@@ -350,7 +350,6 @@ include("plotCabidaOptima.jl")
 include("generaCalles.jl")
 include("generaSombraEdificio.jl")
 include("optiEdificio.jl")
-include("generaSalidaEntera.jl")
 include("displayResults.jl")
 include("plotBaseEdificio3d.jl")
 include("poly2D.jl")
@@ -366,7 +365,7 @@ include("generaSitiosAleatorios.jl")
 include("ajusteArea.jl")
 
 export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
-       generaCalles, generaSombraEdificio, optiEdificio, generaSalidaEntera, displayResults,  
+       generaCalles, generaSombraEdificio, optiEdificio, displayResults,  
        evol, poly2D, polyShape, resultConverter, plotBaseEdificio3d, ajusteArea,
        executaCalculoCabidas, generaVol3d, generaSombraTeor, 
        generaSupBruta, generaSitiosAleatorios, factorIgualaArea
