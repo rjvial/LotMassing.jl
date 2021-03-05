@@ -158,7 +158,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
-        a1 = 6
+        a1 = 2#6
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 0
         @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
@@ -174,7 +174,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         lb2_opt = linSpace1[kopt1]
         ub2_opt = linSpace1[kopt1+1]
 
-        a2 = 6
+        a2 = 2#6
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
         @showprogress 1 "Cálculo más Preciso..." for k = 1:a2

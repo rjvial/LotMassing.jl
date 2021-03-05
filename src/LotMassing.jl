@@ -187,9 +187,6 @@ struct salidaNormativa
     maxConstructibilidad
     maxPisos
     maxAltura
-    minEstacionamientosVendibles
-    minEstacionamientosVisita
-    minEstacionamientosDiscapacitados
 end
 
 struct salidaArquitectonica
@@ -227,6 +224,14 @@ struct salidaOptimizacion
     dualMaxOcupación
     dualMaxConstructibilidad
     dualMaxDensidad
+    estacionamientosVisitas
+    estacionamientosVendiblesPre
+    estacionamientosVendibles
+    estacionamientosBicicletasPre
+    estacionamientosBicicletas      
+    descuentoEstCercaniaMetro
+    descuentoEstBicicletas
+    cambioEstBicicletas
 end
 
 

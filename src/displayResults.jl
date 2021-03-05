@@ -28,19 +28,25 @@ function displayResults(sn, sa, si, st, so, sm, sf)
     println("Superficie por Piso: ", round(sa.superficiePorPiso, digits = 2))
     println("N° Estac. Vendibles: ", round(sa.estacionamientosVendibles, digits = 2))
     println("N° Estac. Visita: ", round(sa.estacionamientosVisita, digits = 2))
-    println("N° Estac. Discapacitados: ", round(sn.minEstacionamientosDiscapacitados, digits = 2))
     println("N° Estac. Totales: ", round(sa.estacionamientosVendibles, digits = 2) + round(sa.estacionamientosVisita, digits = 2))
     println("N° Estac. Bicicletas: ", round(sa.numBicicleteros, digits = 2))
-    println("N° Estac. a Descontar por Bicicletas: ", round(sa.descuentoEstBicicletas, digits = 2)) #descuentoEstBicicletas
-    println("N° Estac. a Cambiar por Bicicletas: ", round(sa.cambioEstBicicletas, digits = 2)) #cambioEstBicicletas
-    println("N° Estac. a Descontar por Cercanía Metro: ", round(sa.descuentoEstCercaniaMetro, digits = 2)) #descuentoEstCercaniaMetro
+
 
     println("")
     println(" Análisis de Holguras:")
     println("----------------------------------------------")
-    println(" Rest. Coef. Ocupación: ", round(so.dualMaxOcupación, digits = 2), " m2")
-    println(" Rest. Constructibilidad Máxima: ", round(so.dualMaxConstructibilidad, digits = 2), " m2")
-    println(" Rest. Densidad Máxima: ", round(so.dualMaxDensidad, digits = 2), " unidades")
+    println("Rest. Coef. Ocupación: ", round(so.dualMaxOcupación, digits = 2), " m2")
+    println("Rest. Constructibilidad Máxima: ", round(so.dualMaxConstructibilidad, digits = 2), " m2")
+    println("Rest. Densidad Máxima: ", round(so.dualMaxDensidad, digits = 2), " unidades")
+    println("estacionamientosVisitas: ", round(so.estacionamientosVisitas, digits = 2)) 
+    println("estacionamientosVendiblesPre: ", round(so.estacionamientosVendiblesPre, digits = 2)) 
+    println("estacionamientosVendibles: ", round(so.estacionamientosVendibles, digits = 2)) 
+    println("estacionamientosBicicletasPre: ", round(so.estacionamientosBicicletasPre, digits = 2)) 
+    println("estacionamientosBicicletas: ", round(so.estacionamientosBicicletas, digits = 2)) 
+    println("descuentoEstCercaniaMetro: ", round(so.descuentoEstCercaniaMetro, digits = 2)) 
+    println("descuentoEstBicicletas: ", round(so.descuentoEstBicicletas, digits = 2)) 
+    println("cambioEstBicicletas: ", round(so.cambioEstBicicletas, digits = 2)) 
+    
 
     println("")
     println("Características del Terreno:")

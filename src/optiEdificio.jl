@@ -175,9 +175,6 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS), # maxConstructibilidad
             dcn.MAXPISOS, # maxPisos
             dcn.ALTURAMAX, # maxAltura
-            ceil(JuMP.value(estacionamientosVendibles)), # minEstacionamientosVendible
-            ceil(JuMP.value(estacionamientosVisitas)), # minEstacionamientosVisita
-            ceil(estacionamientosDiscapacitados) # minEstacionamientosDiscapacitados
         )
 
         sa = salidaArquitectonica(
@@ -216,6 +213,14 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             superficieTerreno * dcn.COEFOCUPACION - areaBasalPso,
             superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) - JuMP.value(superficieUtil), # dualMaxConstructibilidad
             maxDeptos - sum(JuMP.value.(numDeptosTipo)), # dualMaxDensidad
+            JuMP.value(estacionamientosVisitas), # estacionamientosVisitas
+            JuMP.value(estacionamientosVendiblesPre), # estacionamientosVendiblesPre
+            JuMP.value(estacionamientosVendibles), # estacionamientosVendibles
+            JuMP.value(estacionamientosBicicletasPre), # estacionamientosBicicletasPre
+            JuMP.value(estacionamientosBicicletas), # estacionamientosBicicletas 
+            JuMP.value(descuentoEstCercaniaMetro), # descuentoEstCercaniaMetro
+            JuMP.value(descuentoEstBicicletas), # descuentoEstBicicletas
+            JuMP.value(cambioEstBicicletas) # cambioEstBicicletas
         )
 
         sm = salidaMonetaria( 
