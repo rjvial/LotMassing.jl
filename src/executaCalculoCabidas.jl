@@ -104,7 +104,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         display("Inicio de Cálculo")
         min_alt = min(maximum(vecAlturas_cs), dcn.RASANTE * dcn.SEPMIN); max_alt = maximum(vecAlturas_cs)
-        #min_theta = -pi; max_theta =  pi;
         min_theta = pi/2; max_theta =  pi;
 
         min_largo = sepNaves; max_largo = 100; 
@@ -158,7 +157,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
-        a1 = 2#6
+        a1 = 6
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 0
         @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
@@ -174,7 +173,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         lb2_opt = linSpace1[kopt1]
         ub2_opt = linSpace1[kopt1+1]
 
-        a2 = 2#6
+        a2 = 6
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
         @showprogress 1 "Cálculo más Preciso..." for k = 1:a2
