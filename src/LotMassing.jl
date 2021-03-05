@@ -187,6 +187,9 @@ struct salidaNormativa
     maxConstructibilidad
     maxPisos
     maxAltura
+    minEstacionamientosVendibles
+    minEstacionamientosVisita
+    minEstacionamientosDiscapacitados
 end
 
 struct salidaArquitectonica
@@ -204,9 +207,6 @@ struct salidaArquitectonica
     estacionamientosVisita
     numEstacionamientos
     numBicicleteros
-    descuentoEstBicicletas
-    cambioEstBicicletas
-    descuentoEstCercaniaMetro
 end
 
 struct salidaTerreno
@@ -224,14 +224,6 @@ struct salidaOptimizacion
     dualMaxOcupación
     dualMaxConstructibilidad
     dualMaxDensidad
-    estacionamientosVisitas
-    estacionamientosVendiblesPre
-    estacionamientosVendibles
-    estacionamientosBicicletasPre
-    estacionamientosBicicletas      
-    descuentoEstCercaniaMetro
-    descuentoEstBicicletas
-    cambioEstBicicletas
 end
 
 
@@ -345,6 +337,14 @@ MATCONFHOR_ = [[1 0 1];
                [0 NaN NaN]];
 
 
+"""
+MATCELDASCONF_ = [[1 3 5];
+                  [1 3 NaN];
+                  [1 NaN NaN]];
+MATCONFHOR_ = [[1 0 1];
+               [1 0 NaN];
+               [1 NaN NaN]];
+"""
 
 export MATCELDASCONF_, MATCONFHOR_
 
@@ -370,8 +370,8 @@ include("generaSitiosAleatorios.jl")
 include("ajusteArea.jl")
 
 export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
-       generaCalles, generaSombraEdificio, optiEdificio, displayResults,  
-       evol, poly2D, polyShape, resultConverter, plotBaseEdificio3d, ajusteArea,
+       generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
+       resultConverter, plotBaseEdificio3d, ajusteArea,
        executaCalculoCabidas, generaVol3d, generaSombraTeor, 
        generaSupBruta, generaSitiosAleatorios, factorIgualaArea
 end
