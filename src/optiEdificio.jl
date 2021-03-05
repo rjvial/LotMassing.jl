@@ -116,6 +116,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     @constraints(m, begin
+    # Restricciones para el Cálculo de Estacionamientos y Bicicletas
         estacionamientosVendiblesPre <= sum(dcn.ESTACIONAMIENTOSPORVIV .* numDeptosTipo) + 1
         estacionamientosVendiblesPre >= sum(dcn.ESTACIONAMIENTOSPORVIV .* numDeptosTipo)
         estacionamientosVisitas >= estacionamientosVendiblesPre * dcn.PORCADICESTACVISITAS
