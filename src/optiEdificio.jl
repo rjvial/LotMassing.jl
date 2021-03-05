@@ -31,10 +31,10 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
         0 <= numDeptosTipo[u=1:numTiposDepto], Int
         0 <= CostoUnitTerreno
         0 <= estacionamientosVisitas, Int
-        0 <= estacionamientosVendibles, Int
         0 <= estacionamientosVendiblesPre, Int
-        0 <= estacionamientosBicicletas, Int
+        0 <= estacionamientosVendibles, Int
         0 <= estacionamientosBicicletasPre, Int
+        0 <= estacionamientosBicicletas, Int        
         0 <= descuentoEstCercaniaMetro, Int
         0 <= descuentoEstBicicletas, Int
         0 <= cambioEstBicicletas, Int
@@ -123,7 +123,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
         estacionamientosBicicletasPre <= (estacionamientosVendiblesPre + estacionamientosVisitas) * 0.5 + 1 
         estacionamientosBicicletasPre >= (estacionamientosVendiblesPre + estacionamientosVisitas) * 0.5  
         descuentoEstCercaniaMetro <= (estacionamientosVendiblesPre + estacionamientosVisitas) * 0.5 * dcn.REDUCCIONESTPORDISTMETRO
-        descuentoEstBicicletas >= estacionamientosBicicletasPre / dcn.BICICLETASPOREST - 1
+        #descuentoEstBicicletas >= estacionamientosBicicletasPre / dcn.BICICLETASPOREST - 1
         descuentoEstBicicletas <= estacionamientosBicicletasPre / dcn.BICICLETASPOREST
         descuentoEstBicicletas + cambioEstBicicletas <= (estacionamientosVendiblesPre + estacionamientosVisitas) / 3
         estacionamientosVendibles >= estacionamientosVendiblesPre - descuentoEstCercaniaMetro - descuentoEstBicicletas - cambioEstBicicletas        
