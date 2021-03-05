@@ -1,4 +1,4 @@
-function generaSombraTeor_v3(ps_volteor, matConexionVertices, vecVertices, ps_publico, ps_calles)
+function generaSombraTeor(ps_volteor, matConexionVertices, vecVertices, ps_publico, ps_calles)
 
     V_ = ps_volteor.Vertices[1]
     numVerticesTotales, numDim = size(V_);

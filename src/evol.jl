@@ -1,18 +1,37 @@
-function evol(fitness, lb, ub, numParticles, maxiter, verbose)
+function evol(fitness, lb, ub, MaxSteps, MaxStepsWithoutProgress, verbose)
 
-    method = DE(populationSize = numParticles, F = 0.9, K = 0.5*(0.9+1));
-    #method = CMAES(mu = 300, lambda = 1200)
-    bounds = Evolutionary.ConstraintBounds(lb,ub,[],[]);
-    #pop = Evolutionary.initial_population(method, bounds);
+    # Minimum update interval 0.5 seconds
+    Prog = ProgressMeter.Progress(MaxSteps, 0.5, "Final Optimization...")
 
-    options = Evolutionary.Options(iterations=maxiter, show_trace = verbose)
-    result = Evolutionary.optimize(fitness, bounds, method, options)
+    callback_progress_stepper = optcontroller -> ProgressMeter.update!(Prog, BlackBoxOptim.num_steps(optcontroller))
 
+    sr = [(lb[i], ub[i]) for i = 1:length(lb)]
 
-    xopt = Evolutionary.minimizer(result)
-    fopt = Evolutionary.minimum(result)
+    if verbose
+        opt = bbsetup(fitness; 
+            SearchRange = sr, 
+            NumDimensions = length(lb),
+            Method = :adaptive_de_rand_1_bin_radiuslimited, 
+            #MaxFuncEvals = MaxFuncEvals,
+            MaxSteps = MaxSteps,
+            MaxStepsWithoutProgress = MaxStepsWithoutProgress,
+            CallbackFunction = callback_progress_stepper, 
+            CallbackInterval = 0.0,
+            TraceMode = :silent)
+    else
+        opt = bbsetup(fitness; 
+            SearchRange = sr, 
+            MaxSteps = MaxSteps,
+            MaxStepsWithoutProgress = MaxStepsWithoutProgress,
+            NumDimensions = length(lb),
+            Method = :adaptive_de_rand_1_bin_radiuslimited, 
+            TraceMode = :silent)
+    end
+    result = BlackBoxOptim.bboptimize(opt)
+    fopt = BlackBoxOptim.best_fitness(result)
+    xopt = BlackBoxOptim.best_candidate(result)
 
-
+    
     return xopt, fopt
 
 end

@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, Random, CSV
+using LotMassing, .poly2D, .polyShape, CSV
 
 #Random.seed!(1236)
 #Random.seed!(1230)
@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, Random, CSV
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 8#9#3 # predio = 1,2,3,4,5,6,75,8
-conjuntoTemplates = [4]#[1:L, 2:C, 3:H, 4:V]
+idPredio = 9 #8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [1] #4 [1:L, 2:C, 3:lll, 4:V]
 
 fpe = FlagPlotEdif3D(true,  # predio
                      true,  # volTeor
@@ -43,7 +43,7 @@ dcn = datosCabidaNormativa(5, # SEPMIN (m): max(4, separación mínima deslindes
                      [.5, 1, 1, 1], # ESTACIONAMIENTOSPORVIV (unidades / departamento)
                      .15, # PORCADICESTACVISITAS (unidades / estacionamiento vendible)
                      34, # SUPPORESTACIONAMIENTO (m2 / Estacionamiento)
-                     .25, # ESTBICICLETAPORVIV (unidades / estacionamientos totales)
+                     .5, # ESTBICICLETAPORVIV (unidades / estacionamientos totales)
                      3, # BICICLETASPOREST 
                      true, # FLAGCAMBIOESTPORBICICLETA
                      10, # MAXSUBTE (unidades)
@@ -55,7 +55,7 @@ dcn = datosCabidaNormativa(5, # SEPMIN (m): max(4, separación mínima deslindes
 dca = datosCabidaArquitectura(2.55, # 2.625, # ALTURAPISO (m / piso)
                          .2, # PORCSUPCOMUN (m2 / m2 útil)
                          .05, # PORCTERRAZA (m2 / m2 útil)
-                         8,#12, # ANCHOMAX (m) 
+                         15,#12, # ANCHOMAX (m) 
                          [], 
                          []
                          );
@@ -134,6 +134,9 @@ dcr = datosCabidaRentabilidad(1.20) # RetornoExigido
      
 
 if idPredio == 1
+    dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
+    dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
+
     factorCorreccion = 2;
     x = factorCorreccion * [0 30 40 45 10]';
     y = factorCorreccion * [10 0 15 35 30]';
@@ -225,7 +228,7 @@ elseif idPredio == 8
     dcn.MAXPISOS = 40 # 9, #MAXPISOS (unidades)
     dcn.COEFOCUPACION = .4 # COEFOCUPACION (m2 / m2 de terreno)
     dcn.SUBPREDIALMIN = 1000 # SUBPREDIALMIN (m2)
-    dcn.DENSIDADMAX = 20000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
+    dcn.DENSIDADMAX = 2000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
     dcn.COEFCONSTRUCTIBILIDAD = 3.2 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
 
     dcc.SUPDEPTOUTIL = [20, 35, 45, 55] # SUPDEPTOUTIL (m2)
@@ -260,13 +263,13 @@ elseif idPredio == 9
     dcn.ANTEJARDIN = 7 # ANTEJARDIN (m) 
     dcn.ALTURAMAX = 52.5 #47 # 24, #ALTURAMAX (m)
     dcn.MAXPISOS = 15 # 9, #MAXPISOS (unidades)
-    dcn.COEFOCUPACION = .3 # COEFOCUPACION (m2 / m2 de terreno)
+    dcn.COEFOCUPACION = .3 # COEFOCUPACION (m2 de base / m2 de terreno)
     dcn.SUBPREDIALMIN = 1500 # SUBPREDIALMIN (m2)
     dcn.DENSIDADMAX = 880 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
     dcn.FLAGDENSIDADBRUTA = false # FLAGDENSIDADBRUTA
-    dcn.COEFCONSTRUCTIBILIDAD = 2.8 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
-    dcn.ESTACIONAMIENTOSPORVIV = [1, 2, 2, 2] # ESTACIONAMIENTOSPORVIV
-    dcn.FLAGCAMBIOESTPORBICICLETA = false # FLAGCAMBIOESTPORBICICLETA
+    dcn.COEFCONSTRUCTIBILIDAD = 2.8 # COEFCONSTRUCTIBILIDAD (m2 de Sup. Util/ m2 de terreno)
+    dcn.ESTACIONAMIENTOSPORVIV = [1.5, 1.5, 1.5, 2] # ESTACIONAMIENTOSPORVIV
+    dcn.FLAGCAMBIOESTPORBICICLETA = true # FLAGCAMBIOESTPORBICICLETA
 
     dcc.SUPDEPTOUTIL = [50, 90, 110, 140] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [95, 91, 89, 87] # PRECIOVENTA (UF / m2 vendible) 
@@ -274,14 +277,14 @@ elseif idPredio == 9
     dcc.PRECIOVENTAEST = 350 # PRECIOVENTAEST (UF / unidad)
 
     dcu.LosaSNT = 30 # LosaSNT 
-    dcu.LosaBNT = 10 # LosaBNT 
+    dcu.LosaBNT = 12 # LosaBNT 
 
     dca.ANCHOMAX = 8 # Ancho Crujía (m)
     dca.ALTURAPISO = 2.7 # 2.625, # ALTURAPISO (m / piso)
     dca.PORCSUPCOMUN = .2 # PORCSUPCOMUN (m2 / m2 útil)
 
-    #nombreArchivo = "el_dante_2.csv"
-    nombreArchivo = "predio_ElDante.csv"
+    nombreArchivo = "el_dante_2.csv"
+    #nombreArchivo = "predio_ElDante.csv"
     loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1,numDatos)
@@ -294,12 +297,12 @@ elseif idPredio == 9
     x = x[2:end]
     y = y[2:end]
     V = [x y]
-    factorCorreccion = ajusteArea(V, areaSup)
+    factorCorreccion = factorIgualaArea(V, areaSup)
     x = factorCorreccion * x
     y = factorCorreccion * y
     
-#    dcp = datosCabidaPredio(x, y, [1,2,3], [15,15,15], 0, 200);
-    dcp = datosCabidaPredio(x, y, [1,2,3,4,5,6], [15,15,15,15,15,20], 0, 200);
+    dcp = datosCabidaPredio(x, y, [1,2,3], [15,15,15], 0, 200);
+#    dcp = datosCabidaPredio(x, y, [1,2,3,4,5,6], [15,15,15,15,15,20], 0, 200);
 
 end
 

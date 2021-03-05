@@ -1,4 +1,4 @@
-function plotBaseEdificio3d_v2(fpe, x, alturaPiso, ps_predio,
+function plotBaseEdificio3d(fpe, x, alturaPiso, ps_predio,
                              ps_volteor, matConexionVertices_ss, vecVertices_ss, 
                             ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
                             ps_publico, ps_calles, ps_base, ps_baseSeparada)
@@ -55,7 +55,7 @@ function plotBaseEdificio3d_v2(fpe, x, alturaPiso, ps_predio,
     end
 
     
-    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor_v3(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
+    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
     if f_sombraVolTeor_p
         fig, ax, ax_mat = polyShape.plotPolyshape3d_v3(ps_SombraVolTeor_p, 0, fig, ax, ax_mat, "gold", 0.3)
     end

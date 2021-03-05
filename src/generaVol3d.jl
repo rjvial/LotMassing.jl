@@ -1,4 +1,4 @@
-function generaVol3d_v4(V_predio, V_bruto, rasante, dcn, dcp)
+function generaVol3d(V_predio, V_bruto, rasante, dcn, dcp)
 
     numLadosPredio = size(V_predio, 1);
     conjuntoLados = 1:numLadosPredio

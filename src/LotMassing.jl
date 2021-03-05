@@ -1,6 +1,6 @@
 module LotMassing
 
-using NPFinancial, JuMP, GAMS, Evolutionary, Polyhedra #, Cbc
+using NPFinancial, JuMP, GAMS, Polyhedra, BlackBoxOptim, Random, ProgressMeter #, Cbc
 
 
 
@@ -207,6 +207,9 @@ struct salidaArquitectonica
     estacionamientosVisita
     numEstacionamientos
     numBicicleteros
+    descuentoEstBicicletas
+    cambioEstBicicletas
+    descuentoEstCercaniaMetro
 end
 
 struct salidaTerreno
@@ -219,6 +222,13 @@ struct salidaTerreno
     costoTerreno
     costoUnitTerreno
 end
+
+struct salidaOptimizacion
+    dualMaxOcupación
+    dualMaxConstructibilidad
+    dualMaxDensidad
+end
+
 
 struct salidaIndicadores
     IngresosVentas
@@ -287,7 +297,7 @@ end
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
          datosCabidaFlujo, datosCabidaRentabilidad, RotInfo, SubPoly, PolyData, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
-         salidaTerreno, salidaNormativa, salidaFlujoCaja, salidaGeometria, PolyShape, FlagPlotEdif3D, ConstraintData,
+         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, salidaGeometria, PolyShape, FlagPlotEdif3D, ConstraintData,
          ResultadoCabida
 
 struct particulaPso
@@ -330,45 +340,33 @@ MATCONFHOR_ = [[1 0 1];
                [0 NaN NaN]];
 
 
-"""
-MATCELDASCONF_ = [[1 3 5];
-                  [1 3 NaN];
-                  [1 NaN NaN]];
-MATCONFHOR_ = [[1 0 1];
-               [1 0 NaN];
-               [1 NaN NaN]];
-"""
 
 export MATCELDASCONF_, MATCONFHOR_
 
 include("generaMatCeldasConf.jl")
 include("infoPredio.jl")
 include("calculaAnguloRotacion.jl")
-include("nonconv2sumofconv_v2.jl")
-include("ismembern.jl")
-include("pso.jl")
 include("plotCabidaOptima.jl")
 include("generaCalles.jl")
 include("generaSombraEdificio.jl")
 include("optiEdificio.jl")
 include("displayResults.jl")
-include("plotBaseEdificio3d_v2.jl")
+include("plotBaseEdificio3d.jl")
 include("poly2D.jl")
 include("polyShape.jl")
 include("evol.jl")
-include("resultConverter_v2.jl")
+include("resultConverter.jl")
 include("executaCalculoCabidas.jl")
-include("generaVol3d_v4.jl")
-include("generaSombraTeor_v3.jl")
-include("randomPointsNearVertices.jl")
-include("ajusteArea.jl")
+include("generaVol3d.jl")
+include("generaSombraTeor.jl")
+include("factorIgualaArea.jl")
 include("generaSupBruta.jl")
-include("combinaSoluciones_v2.jl")
+include("generaSitiosAleatorios.jl")
+include("ajusteArea.jl")
 
-export generaMatCeldasConf, infoPredio, calculaAnguloRotacion, ismembern, plotCabidaOptima,  
-       pso, generaCalles, generaSombraEdificio,
-       optiEdificio,  displayResults, evol, poly2D, polyShape, 
-       nonconv2sumofconv_v2, resultConverter_v2, plotBaseEdificio3d_v2,
-       executaCalculoCabidas, generaVol3d_v4, generaSombraTeor_v3, randomPointsNearVertices, ajusteArea, generaSupBruta,
-       combinaSoluciones_v2
+export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
+       generaCalles, generaSombraEdificio, optiEdificio, displayResults,  
+       evol, poly2D, polyShape, resultConverter, plotBaseEdificio3d, ajusteArea,
+       executaCalculoCabidas, generaVol3d, generaSombraTeor, 
+       generaSupBruta, generaSitiosAleatorios, factorIgualaArea
 end
