@@ -3,7 +3,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     areaBasalPso = polyShape.polyArea_v2(ps_base)
     numTiposDepto = length(dcc.SUPDEPTOUTIL);
     superficieDensidad = dcn.FLAGDENSIDADBRUTA ? superficieTerrenoBruta : superficieTerreno
-    maxDeptos = dcn.DENSIDADMAX / 4 * superficieDensidad / 10000;
+    maxDeptos = floor(dcn.DENSIDADMAX / 4 * superficieDensidad / 10000);
     numPisosMaxVol = Int(floor(alturaEdif / dca.ALTURAPISO))
     
 
@@ -11,9 +11,9 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     # PARTE "3": DEFINICIÓN SOLVER               #
     ##############################################
 
-    #m = Model(Cbc.Optimizer)
-    #set_optimizer_attribute(m, "ratioGap", 0.001)
-    #set_optimizer_attribute(m, "threads", 3)
+    # m = Model(Cbc.Optimizer)
+    # set_optimizer_attribute(m, "ratioGap", 0.001)
+    # set_optimizer_attribute(m, "threads", 3)
     
 
     m = Model(GAMS.Optimizer)
@@ -27,11 +27,18 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     @variables(m, begin
-        0 <= numPisos <= dcn.MAXPISOS
-        0 <= numDeptosTipo[u = 1:numTiposDepto]
+        0 <= numPisos <= dcn.MAXPISOS, Int
+        0 <= numDeptosTipo[u=1:numTiposDepto], Int
         0 <= CostoUnitTerreno
+        0 <= estacionamientosVisitas, Int
+        0 <= estacionamientosVendiblesPre, Int
+        0 <= estacionamientosVendibles, Int
+        0 <= estacionamientosBicicletasPre, Int
+        0 <= estacionamientosBicicletas, Int        
+        0 <= descuentoEstCercaniaMetro, Int
+        0 <= descuentoEstBicicletas, Int
+        0 <= cambioEstBicicletas, Int
     end)
-
 
 
     ##############################################
@@ -39,22 +46,11 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     # Cálculo Número de Estacionamientos
-    estacionamientosViviendas = sum(dcn.ESTACIONAMIENTOSPORVIV .* numDeptosTipo) 
-    estacionamientosVisitas = estacionamientosViviendas * dcn.PORCADICESTACVISITAS;
-    estacionamientosNormales = estacionamientosViviendas + estacionamientosVisitas
     estacionamientosDiscapacitados = (maxDeptos <= 20) ? 1 : 
                                      ((maxDeptos <= 50) ? 2 : 
                                      ((maxDeptos <= 200) ? 3 : 
                                      ((maxDeptos <= 400) ? 4 : 
-                                     ((maxDeptos <= 500) ? 5 : (0.01*maxDeptos)))))
-    estacionamientosBicicletas = estacionamientosNormales * dcn.ESTBICICLETAPOREST;
-    descuentoEstCercaniaMetro = estacionamientosNormales * 0.5*dcn.REDUCCIONESTPORDISTMETRO
-    descuentoEstBicicletas = estacionamientosBicicletas/dcn.BICICLETASPOREST
-    estacionamientosNormales = estacionamientosNormales - descuentoEstCercaniaMetro - descuentoEstBicicletas
-    cambioEstBicicletas = (dcn.FLAGCAMBIOESTPORBICICLETA) ? estacionamientosNormales / 3 : 0
-    estacionamientosVendibles = estacionamientosViviendas - descuentoEstCercaniaMetro - descuentoEstBicicletas - cambioEstBicicletas
-    estacionamientosBicicletas = estacionamientosBicicletas + cambioEstBicicletas * dcn.BICICLETASPOREST
-    estacionamientos = estacionamientosVendibles + estacionamientosVisitas + estacionamientosDiscapacitados + estacionamientosBicicletas / dcn.BICICLETASPOREST;
+                                     ((maxDeptos <= 500) ? 5 : (0.01 * maxDeptos)))))
     
 
     # Cálculo de Superficies
@@ -120,6 +116,20 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     @constraints(m, begin
+    # Restricciones para el Cálculo de Estacionamientos y Bicicletas
+        estacionamientosVendiblesPre <= sum(dcn.ESTACIONAMIENTOSPORVIV .* numDeptosTipo) + 1
+        estacionamientosVendiblesPre >= sum(dcn.ESTACIONAMIENTOSPORVIV .* numDeptosTipo)
+        estacionamientosVisitas >= estacionamientosVendiblesPre * dcn.PORCADICESTACVISITAS
+        estacionamientosBicicletasPre <= (estacionamientosVendiblesPre + estacionamientosVisitas) * 0.5 + 1 
+        estacionamientosBicicletasPre >= (estacionamientosVendiblesPre + estacionamientosVisitas) * 0.5  
+        descuentoEstCercaniaMetro <= (estacionamientosVendiblesPre + estacionamientosVisitas) * 0.5 * dcn.REDUCCIONESTPORDISTMETRO
+        #descuentoEstBicicletas >= estacionamientosBicicletasPre / dcn.BICICLETASPOREST - 1
+        descuentoEstBicicletas <= estacionamientosBicicletasPre / dcn.BICICLETASPOREST
+        descuentoEstBicicletas + cambioEstBicicletas <= (estacionamientosVendiblesPre + estacionamientosVisitas) / 3
+        estacionamientosVendibles >= estacionamientosVendiblesPre - descuentoEstCercaniaMetro - descuentoEstBicicletas - cambioEstBicicletas        
+        estacionamientosBicicletas >= estacionamientosBicicletasPre + (cambioEstBicicletas + descuentoEstBicicletas)* dcn.BICICLETASPOREST - 1
+        estacionamientosBicicletas <= estacionamientosBicicletasPre + (cambioEstBicicletas + descuentoEstBicicletas)* dcn.BICICLETASPOREST
+
     # Restricción de Altura Máxima y Área Basal Máxima (Coeficiente de Ocupación)
         maxAltura, numPisos * dca.ALTURAPISO <= alturaEdif
         
@@ -154,46 +164,9 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     if termination_status(m) == MOI.OPTIMAL
         status = true
 
-    ##############################################
-    # PARTE "8": PRESENTACION DE RESULTADOS      #
-    ##############################################
-
-        # Cálculo del Flujo de Caja y la Tir
-        fl_IngresosVentas = dcf.IngresosVentas .* JuMP.value(IngresosVentas);
-        fl_CostoTerreno = dcf.CostoTerreno .* JuMP.value(CostoTerreno);
-        fl_CostoConstruccion = dcf.CostoConstruccion .* JuMP.value(CostoConstruccion);
-        fl_CostoHonorariosProyectos = dcf.CostoHonorariosProyectos .* JuMP.value(CostoHonorariosProyectos);
-        fl_CostoVenta = dcf.CostoVenta .* JuMP.value(CostoVenta);
-        fl_CostoInmobiliarioObra = dcf.CostoInmobiliarioObra .* JuMP.value(CostoInmobiliarioObra);
-        fl_CostosHabilitacion = dcf.CostosHabilitacion .* CostosHabilitacion;
-        fl_CostosPuestaEnMarcha = dcf.CostosPuestaEnMarcha .* CostosPuestaEnMarcha;
-        fl_CostosAtencionCliente = dcf.CostosAtencionCliente .* JuMP.value(CostosAtencionCliente);
-        fl_Imprevistos = dcf.Imprevistos .* JuMP.value(Imprevistos);
-        fl_CostoPagoIVA = fl_IngresosVentas .* (1 - JuMP.value(CostoTerreno) / sum(fl_IngresosVentas)) .* (0.19 / 1.19) -
-                    (fl_CostoConstruccion + fl_CostoVenta + fl_CostosHabilitacion) .* (0.19 / 1.19);
-        fl_FlujoCajaNetoAntesImpuesto = fl_IngresosVentas - fl_CostoTerreno - fl_CostoConstruccion - fl_CostoHonorariosProyectos - fl_CostoVenta -
-                                fl_CostoInmobiliarioObra - fl_CostosHabilitacion - fl_CostosPuestaEnMarcha - fl_CostosAtencionCliente -
-                                fl_Imprevistos - fl_CostoPagoIVA;
-        tirAntesImpuesto = (NPFinancial.irr(fl_FlujoCajaNetoAntesImpuesto) + 1)^2 - 1;
-
-        numFlujos = length(fl_FlujoCajaNetoAntesImpuesto);
-        fl_FlujoCajaNetoAntesImpuestos_acum = cumsum(fl_FlujoCajaNetoAntesImpuesto);
-        vecCorrel = 1:numFlujos;
-        flag = cumsum(fl_FlujoCajaNetoAntesImpuestos_acum .> 0) .== 1;
-        flagCorrel = vecCorrel .* flag;
-        posNoNeg = findall(x->x > 0, flagCorrel)
-        fl_ImpuestoRenta = zeros(Float64, (numFlujos,));
-        fl_ImpuestoRenta[posNoNeg] = fl_FlujoCajaNetoAntesImpuestos_acum[posNoNeg] * dcf.TasaImpuestoRenta;
-        fl_FlujoCajaNetoDespuesImpuesto = fl_FlujoCajaNetoAntesImpuesto - fl_ImpuestoRenta;
-        tirDespuesImpuesto = (NPFinancial.irr(fl_FlujoCajaNetoDespuesImpuesto) + 1)^2 - 1;
-
-        fl_LineaCredito = (dcf.ingresoLineaCredito - dcf.pagoLineaCredito) * JuMP.value(CostoConstruccion);
-        fl_MontoUtilizadoLineaCredito = cumsum(fl_LineaCredito);
-        fl_InteresLineaCredito = fl_MontoUtilizadoLineaCredito * dcf.TasaInteresLineaCredito / 2;
-        fl_CostoOperacionalCredito = fl_CostoConstruccion ./ sum(fl_CostoConstruccion) * dcf.DuracionLineaCredito * dcf.Tasaciones;
-        fl_FlujoCajaApalancadoNetoAntesImpuesto = fl_FlujoCajaNetoAntesImpuesto + fl_LineaCredito - fl_InteresLineaCredito - fl_CostoOperacionalCredito;
-        tirApalancadoAntesImpuestos = (NPFinancial.irr(fl_FlujoCajaApalancadoNetoAntesImpuesto) + 1)^2 - 1;
-
+        ##############################################
+        # PARTE "8": PRESENTACION DE RESULTADOS      #
+        ##############################################
 
         # Construye estructura con los resultados de la optimización   
         sn = salidaNormativa(
@@ -202,9 +175,6 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS), # maxConstructibilidad
             dcn.MAXPISOS, # maxPisos
             dcn.ALTURAMAX, # maxAltura
-            JuMP.value(estacionamientosVendibles), # minEstacionamientosVendible
-            JuMP.value(estacionamientosVisitas), # minEstacionamientosVisita
-            estacionamientosDiscapacitados # minEstacionamientosDiscapacitados
         )
 
         sa = salidaArquitectonica(
@@ -213,28 +183,20 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             areaBasalPso, # ocupacion
             JuMP.value(superficieUtil), # constructibilidad
             JuMP.value(numPisos), # numPisos
-            JuMP.value(numPisos)*dca.ALTURAPISO, # altura
+            JuMP.value(numPisos) * dca.ALTURAPISO, # altura
             JuMP.value(superficieVendible), # superficieUtilSNT
             JuMP.value(superficieComun), # superficieComunSNT
             JuMP.value(superficieVendible) + JuMP.value(superficieComun), # superficieEdificadaSNT
-            areaBasalPso, # superficiePorPiso
+            (JuMP.value(superficieVendible) + JuMP.value(superficieComun)) / JuMP.value(numPisos), # superficiePorPiso
             JuMP.value(estacionamientosVendibles), # estacionamientosVendibles
             JuMP.value(estacionamientosVisitas), # estacionamientosVisita
             JuMP.value(estacionamientosVendibles) + JuMP.value(estacionamientosVisitas), # numEstacionamientos Totales
-            JuMP.value(estacionamientosBicicletas) # numBicicleteros
-            )
-
-        si = salidaIndicadores( 
-            JuMP.value(IngresosVentas), # IngresosVentas
-            JuMP.value(CostoTotal), # CostoTotal
-            JuMP.value(IngresosVentas) - JuMP.value(CostoTotal), # MargenAntesImpuesto
-            tirAntesImpuesto, # TirAntesImpuestos
-            dcf.TasaImpuestoRenta * (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal)), # ImpuestoRenta
-            JuMP.value(IngresosVentas) - JuMP.value(CostoTotal) - dcf.TasaImpuestoRenta * (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal)), # UtilidadDespuesImpuesto
-            (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal)) / JuMP.value(CostoTotal), # RentabilidadTotalBruta
-            (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal) - dcf.TasaImpuestoRenta * (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal))) / JuMP.value(CostoTotal), # RentabilidadTotalNeta
-            JuMP.value(CostoTerreno) / JuMP.value(IngresosVentas), # IncidenciaTerreno
+            JuMP.value(estacionamientosBicicletas), # numBicicleteros
+            JuMP.value(descuentoEstBicicletas), # descuentoEstBicicletas
+            JuMP.value(cambioEstBicicletas), # cambioEstBicicletas
+            JuMP.value(descuentoEstCercaniaMetro) # descuentoEstCercaniaMetro
         )
+
 
         st = salidaTerreno( 
             superficieTerreno, # superficieTerreno
@@ -251,6 +213,14 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             superficieTerreno * dcn.COEFOCUPACION - areaBasalPso,
             superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) - JuMP.value(superficieUtil), # dualMaxConstructibilidad
             maxDeptos - sum(JuMP.value.(numDeptosTipo)), # dualMaxDensidad
+            JuMP.value(estacionamientosVisitas), # estacionamientosVisitas
+            JuMP.value(estacionamientosVendiblesPre), # estacionamientosVendiblesPre
+            JuMP.value(estacionamientosVendibles), # estacionamientosVendibles
+            JuMP.value(estacionamientosBicicletasPre), # estacionamientosBicicletasPre
+            JuMP.value(estacionamientosBicicletas), # estacionamientosBicicletas 
+            JuMP.value(descuentoEstCercaniaMetro), # descuentoEstCercaniaMetro
+            JuMP.value(descuentoEstBicicletas), # descuentoEstBicicletas
+            JuMP.value(cambioEstBicicletas) # cambioEstBicicletas
         )
 
         sm = salidaMonetaria( 
@@ -268,6 +238,43 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             JuMP.value(Imprevistos), # Imprevistos
             JuMP.value(CostoPagoIVA) # CostoPagoIVA
         )
+
+        # Cálculo del Flujo de Caja y la Tir
+        fl_IngresosVentas = dcf.IngresosVentas .* JuMP.value(IngresosVentas);
+        fl_CostoTerreno = dcf.CostoTerreno .* JuMP.value(CostoTerreno);
+        fl_CostoConstruccion = dcf.CostoConstruccion .* JuMP.value(CostoConstruccion);
+        fl_CostoHonorariosProyectos = dcf.CostoHonorariosProyectos .* JuMP.value(CostoHonorariosProyectos);
+        fl_CostoVenta = dcf.CostoVenta .* JuMP.value(CostoVenta);
+        fl_CostoInmobiliarioObra = dcf.CostoInmobiliarioObra .* JuMP.value(CostoInmobiliarioObra);
+            fl_CostosHabilitacion = dcf.CostosHabilitacion .* CostosHabilitacion;
+        fl_CostosPuestaEnMarcha = dcf.CostosPuestaEnMarcha .* CostosPuestaEnMarcha;
+        fl_CostosAtencionCliente = dcf.CostosAtencionCliente .* JuMP.value(CostosAtencionCliente);
+        fl_Imprevistos = dcf.Imprevistos .* JuMP.value(Imprevistos);
+        fl_CostoPagoIVA = fl_IngresosVentas .* (1 - JuMP.value(CostoTerreno) / sum(fl_IngresosVentas)) .* (0.19 / 1.19) -
+                            (fl_CostoConstruccion + fl_CostoVenta + fl_CostosHabilitacion) .* (0.19 / 1.19);
+        fl_FlujoCajaNetoAntesImpuesto = fl_IngresosVentas - fl_CostoTerreno - fl_CostoConstruccion - fl_CostoHonorariosProyectos - fl_CostoVenta -
+                                        fl_CostoInmobiliarioObra - fl_CostosHabilitacion - fl_CostosPuestaEnMarcha - fl_CostosAtencionCliente -
+                                        fl_Imprevistos - fl_CostoPagoIVA;
+        tirAntesImpuesto = (NPFinancial.irr(fl_FlujoCajaNetoAntesImpuesto) + 1)^2 - 1;
+        
+        numFlujos = length(fl_FlujoCajaNetoAntesImpuesto);
+        fl_FlujoCajaNetoAntesImpuestos_acum = cumsum(fl_FlujoCajaNetoAntesImpuesto);
+        vecCorrel = 1:numFlujos;
+        flag = cumsum(fl_FlujoCajaNetoAntesImpuestos_acum .> 0) .== 1;
+        flagCorrel = vecCorrel .* flag;
+        posNoNeg = findall(x -> x > 0, flagCorrel)
+        fl_ImpuestoRenta = zeros(Float64, (numFlujos,));
+        fl_ImpuestoRenta[posNoNeg] = fl_FlujoCajaNetoAntesImpuestos_acum[posNoNeg] * dcf.TasaImpuestoRenta;
+        fl_FlujoCajaNetoDespuesImpuesto = fl_FlujoCajaNetoAntesImpuesto - fl_ImpuestoRenta;
+        tirDespuesImpuesto = (NPFinancial.irr(fl_FlujoCajaNetoDespuesImpuesto) + 1)^2 - 1;
+        
+        fl_LineaCredito = (dcf.ingresoLineaCredito - dcf.pagoLineaCredito) * JuMP.value(CostoConstruccion);
+        fl_MontoUtilizadoLineaCredito = cumsum(fl_LineaCredito);
+        fl_InteresLineaCredito = fl_MontoUtilizadoLineaCredito * dcf.TasaInteresLineaCredito / 2;
+        fl_CostoOperacionalCredito = fl_CostoConstruccion ./ sum(fl_CostoConstruccion) * dcf.DuracionLineaCredito * dcf.Tasaciones;
+        fl_FlujoCajaApalancadoNetoAntesImpuesto = fl_FlujoCajaNetoAntesImpuesto + fl_LineaCredito - fl_InteresLineaCredito - fl_CostoOperacionalCredito;
+        tirApalancadoAntesImpuestos = (NPFinancial.irr(fl_FlujoCajaApalancadoNetoAntesImpuesto) + 1)^2 - 1;
+        
 
         sf = salidaFlujoCaja( 
             fl_IngresosVentas, # IngresosVentas
@@ -292,6 +299,18 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
             fl_CostoOperacionalCredito, # CostoOperacionalCredito
             fl_FlujoCajaApalancadoNetoAntesImpuesto, # ApalancadoNetoAntesImpuesto
             tirApalancadoAntesImpuestos # TirApalancadoAntesImpuestos
+        )
+            
+        si = salidaIndicadores( 
+            JuMP.value(IngresosVentas), # IngresosVentas
+            JuMP.value(CostoTotal), # CostoTotal
+            JuMP.value(IngresosVentas) - JuMP.value(CostoTotal), # MargenAntesImpuesto
+            tirAntesImpuesto, # TirAntesImpuestos
+            dcf.TasaImpuestoRenta * (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal)), # ImpuestoRenta
+            JuMP.value(IngresosVentas) - JuMP.value(CostoTotal) - dcf.TasaImpuestoRenta * (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal)), # UtilidadDespuesImpuesto
+            (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal)) / JuMP.value(CostoTotal), # RentabilidadTotalBruta
+            (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal) - dcf.TasaImpuestoRenta * (JuMP.value(IngresosVentas) - JuMP.value(CostoTotal))) / JuMP.value(CostoTotal), # RentabilidadTotalNeta
+            JuMP.value(CostoTerreno) / JuMP.value(IngresosVentas), # IncidenciaTerreno
         )
 
     else

@@ -104,7 +104,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         display("Inicio de Cálculo")
         min_alt = min(maximum(vecAlturas_cs), dcn.RASANTE * dcn.SEPMIN); max_alt = maximum(vecAlturas_cs)
-        #min_theta = -pi; max_theta =  pi;
         min_theta = pi/2; max_theta =  pi;
 
         min_largo = sepNaves; max_largo = 100; 
