@@ -158,24 +158,40 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
-        h = 6
-        kopt = 0
-        @showprogress 1 "Calculando Cabida..." for k = 1:2*h+1
-            if k <= 2*h
-                lb[2] = -pi + (k - 1) * pi / h
-                ub[2] = -pi / h + (k - 1) * pi / h
+        a1 = 6
+        linSpace1 = collect(range(-pi, pi, length = a1))
+        kopt1 = 0
+        @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
+            lb[2] = linSpace1[k]
+            ub[2] = linSpace1[k+1]
+            x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, MaxStepsWithoutProgress, false)
+            if f_k < fopt_cs
+                fopt_cs = f_k
+                xopt_cs = x_k
+                kopt1 = k
+            end
+        end
+        lb2_opt = linSpace1[kopt1]
+        ub2_opt = linSpace1[kopt1+1]
+
+        a2 = 6
+        linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
+        kopt2 = 1
+        @showprogress 1 "Cálculo más Preciso..." for k = 1:a2
+            if k <= a2-1
+                lb[2] = linSpace2[k]
+                ub[2] = linSpace2[k+1]
                 x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, MaxStepsWithoutProgress, false)
             else
-                lb[2] = -pi + (kopt - 1) * pi / h
-                ub[2] = -pi / h + (kopt - 1) * pi / h
+                lb[2] = linSpace2[kopt2]
+                ub[2] = linSpace2[kopt2+1]
                 x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps*2, MaxStepsWithoutProgress, false)
             end
             if f_k < fopt_cs
                 fopt_cs = f_k
                 xopt_cs = x_k
-                kopt = k
+                kopt2 = k
             end
-
         end
 
         
