@@ -624,7 +624,10 @@ function plotPolyshape3d_v4(vec_ps, vec_h, fig=nothing, ax=nothing, ax_mat=nothi
 
 end
 
-
+#function plotPolyshape3d_v1(ps, h=nothing, fig=nothing, ax=nothing, fc="blue", a=1)
+#function plotPolyshape3d_v2(ps, h=nothing, fig=nothing, ax=nothing, ax_mat=nothing, fc="blue", a=1)
+#function plotPolyshape3d_v3(ps, h=nothing, fig=nothing, ax=nothing, ax_mat=nothing, fc="blue", a=0.25)
+#function plotPolyshape3d_v4(vec_ps, vec_h, fig=nothing, ax=nothing, ax_mat=nothing, fc="red", a=0.1)
 function plotPolyshape3d_v5(ps_volteor, matConexionVertices, vecVertices, fig=nothing, ax=nothing, ax_mat=nothing, fc="red", a=0.25)
 
     plt = pyimport("matplotlib.pyplot")

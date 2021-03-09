@@ -81,11 +81,11 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         penalizacionConstructibilidad = max(0, areaBasal*numPisos - maxSupConstruida)
         penalizacionDensidad = max(0, areaBasal*numPisos - maxSupConstruidaDensidad)
 
-        penalizacionNumPisos = numPisos
+        penalizacionNumPisos = 0
 
         total_fit = numPisos * (areaBasal - 100*penalizacionCoefOcup - 100*penalizacion_r) -
                     1000*(penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
-                    10*numPisos * penalizacionNumPisos - 1000*(penalizacionConstructibilidad + penalizacionDensidad)
+                    10 * penalizacionNumPisos - 1000*(penalizacionConstructibilidad + penalizacionDensidad)
 
         return -total_fit
     end

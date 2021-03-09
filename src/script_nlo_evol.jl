@@ -15,7 +15,7 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 4 #8 predio = 1,2,3,4,5,6,7,8
+idPredio = 6 #8 predio = 1,2,3,4,5,6,7,8
 conjuntoTemplates = [1] #4 [1:L, 2:C, 3:lll, 4:V]
 
 @load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr

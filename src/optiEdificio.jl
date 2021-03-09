@@ -11,15 +11,16 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     # PARTE "3": DEFINICIÓN SOLVER               #
     ##############################################
 
-    #m = Model(Cbc.Optimizer)
-    #set_optimizer_attribute(m, "ratioGap", 0.001)
-    #set_optimizer_attribute(m, "threads", 3)
+    m = Model(Cbc.Optimizer)
+    set_optimizer_attribute(m, "ratioGap", 0.001)
+    set_optimizer_attribute(m, "threads", 3)
+    set_optimizer_attribute(m, "logLevel", 0)
     
 
-    m = Model(GAMS.Optimizer)
-    set_optimizer_attribute(m, "OptCR", 0.001)
-    set_optimizer_attribute(m, "Threads", 3)
-    set_optimizer_attribute(m, "logOption", 0)
+    # = Model(GAMS.Optimizer)
+    #set_optimizer_attribute(m, "OptCR", 0.001)
+    #set_optimizer_attribute(m, "Threads", 3)
+    #set_optimizer_attribute(m, "logOption", 0)
 
 
     ##############################################
