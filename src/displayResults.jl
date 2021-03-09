@@ -29,7 +29,7 @@ function displayResults(sn, sa, si, st, so, sm, sf)
     println("N° Estac. Vendibles: ", round(sa.estacionamientosVendibles, digits = 2))
     println("N° Estac. Visita: ", round(sa.estacionamientosVisita, digits = 2))
     println("N° Estac. Discapacitados: ", round(sn.minEstacionamientosDiscapacitados, digits = 2))
-    println("N° Estac. Totales: ", round(sa.estacionamientosVendibles, digits = 2) + round(sa.estacionamientosVisita, digits = 2) + round(sn.minEstacionamientosDiscapacitados, digits = 2))
+    println("N° Estac. Totales: ", round(sa.estacionamientosVendibles, digits = 2) + round(sa.estacionamientosVisita, digits = 2)) 
     println("N° Estac. Bicicletas: ", round(sa.numBicicleteros, digits = 2))
 
     println("")

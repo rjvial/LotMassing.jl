@@ -27,8 +27,8 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     @variables(m, begin
-        0 <= numPisos <= dcn.MAXPISOS
-        0 <= numDeptosTipo[u = 1:numTiposDepto]
+        0 <= numPisos <= dcn.MAXPISOS, Int
+        0 <= numDeptosTipo[u = 1:numTiposDepto], Int
         0 <= CostoUnitTerreno
     end)
 
@@ -47,14 +47,14 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
                                      ((maxDeptos <= 200) ? 3 : 
                                      ((maxDeptos <= 400) ? 4 : 
                                      ((maxDeptos <= 500) ? 5 : (0.01*maxDeptos)))))
-    estacionamientosBicicletas = estacionamientosNormales * dcn.ESTBICICLETAPOREST;
-    descuentoEstCercaniaMetro = estacionamientosNormales * 0.5*dcn.REDUCCIONESTPORDISTMETRO
-    descuentoEstBicicletas = estacionamientosBicicletas/dcn.BICICLETASPOREST
-    estacionamientosNormales = estacionamientosNormales - descuentoEstCercaniaMetro - descuentoEstBicicletas
-    cambioEstBicicletas = (dcn.FLAGCAMBIOESTPORBICICLETA) ? estacionamientosNormales / 3 : 0
-    estacionamientosVendibles = estacionamientosViviendas - descuentoEstCercaniaMetro - descuentoEstBicicletas - cambioEstBicicletas
-    estacionamientosBicicletas = estacionamientosBicicletas + cambioEstBicicletas * dcn.BICICLETASPOREST
-    estacionamientos = estacionamientosVendibles + estacionamientosVisitas + estacionamientosDiscapacitados + estacionamientosBicicletas / dcn.BICICLETASPOREST;
+    estacionamientosBicicletasAntes = estacionamientosNormales * dcn.ESTBICICLETAPOREST;
+    descuentoEstBicicletas = estacionamientosBicicletasAntes/dcn.BICICLETASPOREST
+    descuentoEstCercaniaMetro = 0*estacionamientosNormales * 0.5*dcn.REDUCCIONESTPORDISTMETRO
+    cambioEstBicicletas = 0*dcn.FLAGCAMBIOESTPORBICICLETA * estacionamientosNormales / 3
+    estacionamientosNormalesDespDesc = estacionamientosNormales - descuentoEstCercaniaMetro - descuentoEstBicicletas - cambioEstBicicletas
+    estacionamientosVendibles = estacionamientosNormalesDespDesc - estacionamientosVisitas
+    estacionamientosBicicletas = estacionamientosBicicletasAntes + (descuentoEstBicicletas + cambioEstBicicletas) * dcn.BICICLETASPOREST
+    estacionamientos = estacionamientosVendibles + estacionamientosVisitas;
     
 
     # Cálculo de Superficies

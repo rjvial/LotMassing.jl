@@ -85,7 +85,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
         total_fit = numPisos * (areaBasal - 100*penalizacionCoefOcup - 100*penalizacion_r) -
                     1000*(penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
-                    numPisos * penalizacionNumPisos - 1000*(penalizacionConstructibilidad + penalizacionDensidad)
+                    10*numPisos * penalizacionNumPisos - 1000*(penalizacionConstructibilidad + penalizacionDensidad)
 
         return -total_fit
     end
@@ -152,12 +152,14 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
  
         end
 
-        MaxSteps = 18000
+        
         MaxStepsWithoutProgress = 5000
+
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
-        a1 = 6
+        MaxSteps = 15000#18000
+        a1 = 12#6
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 0
         @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
@@ -173,7 +175,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         lb2_opt = linSpace1[kopt1]
         ub2_opt = linSpace1[kopt1+1]
 
-        a2 = 6
+        a2 = 3#6
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
         @showprogress 1 "Cálculo más Preciso..." for k = 1:a2
