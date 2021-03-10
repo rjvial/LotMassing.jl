@@ -31,6 +31,8 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
         0 <= numPisos <= dcn.MAXPISOS, Int
         0 <= numDeptosTipo[u = 1:numTiposDepto], Int
         0 <= CostoUnitTerreno
+        0 <= superficieComun
+        0 <= superficieUtil
     end)
 
 
@@ -63,9 +65,9 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     superficieUtil = sum(superficieUtilDepto);
     superficieTerrazaDepto = 2 .* superficieUtilDepto .* dca.PORCTERRAZA;
     superficieInteriorDepto = superficieUtilDepto .* (1 - dca.PORCTERRAZA);
-    superficieVendibleDepto = superficieInteriorDepto + .5 * superficieTerrazaDepto; # = superficieUtilDepto
+    superficieVendibleDepto = superficieInteriorDepto + .5 * superficieTerrazaDepto;
     superficieVendible = sum(superficieVendibleDepto);
-    superficieComun = dca.PORCSUPCOMUN * superficieUtil;
+    superficieComun = areaBasalPso*numPisos - superficieUtil
     superficieLosaSNT = superficieVendible + superficieComun;
     superficieLosaBNT = dcn.SUPPORESTACIONAMIENTO * estacionamientosVendibles;
 
@@ -121,6 +123,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
     ##############################################
 
     @constraints(m, begin
+        superficieComun >= dca.PORCSUPCOMUN * superficieUtil
     # Restricción de Altura Máxima y Área Basal Máxima (Coeficiente de Ocupación)
         maxAltura, numPisos * dca.ALTURAPISO <= alturaEdif
         
