@@ -161,7 +161,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         MaxSteps = 15000#18000
         a1 = 12#6
         linSpace1 = collect(range(-pi, pi, length = a1))
-        kopt1 = 0
+        kopt1 = 1
         @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
