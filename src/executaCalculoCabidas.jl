@@ -158,7 +158,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
-        MaxSteps = 15000#18000
+        MaxSteps = 18000#18000
         a1 = 12#6
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 1

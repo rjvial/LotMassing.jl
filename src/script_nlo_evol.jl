@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 1 #8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [4] #4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 9 #8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [2] #4 [1:L, 2:C, 3:lll, 4:V]
 
 @load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr
 
@@ -125,7 +125,7 @@ elseif idPredio == 8
     dca.ANCHOMAX = 8 # Ancho Crujía (m)
 
     nombreArchivo = "predioLaFlorida2.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
+    loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1,numDatos)
     y = zeros(1,numDatos)
@@ -172,7 +172,7 @@ elseif idPredio == 9
 
     nombreArchivo = "el_dante_2.csv"
     #nombreArchivo = "predio_ElDante.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
+    loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1,numDatos)
     y = zeros(1,numDatos)
