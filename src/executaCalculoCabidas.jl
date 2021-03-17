@@ -93,7 +93,6 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     numParticles = 4000# 2000;
     maxIterations = 300# 300;
 
-    resultados = fill(ResultadoCabida(nothing, nothing, nothing, nothing, nothing, nothing, []), length(conjuntoTemplates), 1)
     
     @time begin
         cont = 0
@@ -158,14 +157,14 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_cs = 10000
         xopt_cs = []
-        MaxSteps = 18000#18000
+        MaxSteps_1 = 15000#18000
         a1 = 12#6
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 1
         @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
-            x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, MaxStepsWithoutProgress, false)
+            x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)
             if f_k < fopt_cs
                 fopt_cs = f_k
                 xopt_cs = x_k
@@ -176,17 +175,18 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         ub2_opt = linSpace1[kopt1+1]
 
         a2 = 3#6
+        MaxSteps_2 = 20000
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
         @showprogress 1 "Cálculo más Preciso..." for k = 1:a2
             if k <= a2-1
                 lb[2] = linSpace2[k]
                 ub[2] = linSpace2[k+1]
-                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps, MaxStepsWithoutProgress, false)
+                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_2, MaxStepsWithoutProgress, false)
             else
                 lb[2] = linSpace2[kopt2]
                 ub[2] = linSpace2[kopt2+1]
-                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps*2, MaxStepsWithoutProgress, false)
+                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_2*2, MaxStepsWithoutProgress, false)
             end
             if f_k < fopt_cs
                 fopt_cs = f_k
@@ -202,25 +202,21 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         sn, sa, si, st, so, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
         xopt_cs[1] = sa.altura 
         numPisos = sa.numPisos
-        resultados[cont] = ResultadoCabida(sn, sa, si, st, sm, sf, [xopt_cs])
-        resultados_ = [sn, sa, si, st, so, sm, sf, [xopt_cs]]
+        resultados = ResultadoCabida(sn, sa, si, st, sm, so, sf, [xopt_cs])
+        
 
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
         
-        fig = plotBaseEdificio3d(fpe, resultados[cont].Xopt[1], dca.ALTURAPISO, ps_predio, 
-                                    ps_volteor, matConexionVertices_ss, vecVertices_ss, 
-                                    ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
-                                    ps_publico, ps_calles, ps_base, ps_baseSeparada);
-
-        displayResults(resultados_)
-        println(" ")
-        println(" ")
-        println(" ")
             
     end
     
-    return resultados, ps_predio, ps_base, xopt_cs, fopt_cs, psCorte, 
-            ps_SombraVolTeor_p, ps_sombraEdif_p, ps_SombraVolTeor_s, ps_sombraEdif_s, ps_SombraVolTeor_o, ps_sombraEdif_o
+    return resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
+            ps_volteor, matConexionVertices_ss, vecVertices_ss,
+            ps_restSombra, matConexionVertices_cs, vecVertices_cs,
+            xopt_cs, fopt_cs, 
+            ps_SombraVolTeor_p, ps_sombraEdif_p, 
+            ps_SombraVolTeor_s, ps_sombraEdif_s, 
+            ps_SombraVolTeor_o, ps_sombraEdif_o
 end
 
 

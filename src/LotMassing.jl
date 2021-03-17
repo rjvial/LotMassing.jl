@@ -56,6 +56,7 @@ mutable struct ResultadoCabida
     SalidaIndicadores
     SalidaTerreno
     SalidaMonetaria
+    SalidaOptimizacion
     SalidaFlujoCaja
     Xopt
 end

@@ -1,4 +1,4 @@
-#module Cabida_nlo_evol
+# module Cabida_nlo_evol
 
 ##############################################
 # PARTE "1": CARGA CABIDA                    #
@@ -8,15 +8,15 @@
 
 using LotMassing, .poly2D, .polyShape, CSV, JLD2
 
-#Random.seed!(1236)
-#Random.seed!(1230)
+# Random.seed!(1236)
+# Random.seed!(1230)
 
 ##############################################
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 9 #8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [2] #4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 6 # 8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [1] # 4 [1:L, 2:C, 3:lll, 4:V]
 
 @load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr
 
@@ -82,8 +82,8 @@ elseif idPredio == 7
 
     dca.ANCHOMAX = 10 # ANCHOMAX (m)
 
-    #dcc.SUPDEPTOUTIL = [20, 35, 50, 60] # SUPDEPTOUTIL (m2)
-    #dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
+    # dcc.SUPDEPTOUTIL = [20, 35, 50, 60] # SUPDEPTOUTIL (m2)
+    # dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
 
     dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
@@ -93,8 +93,8 @@ elseif idPredio == 7
     nombreArchivo = "Independencia.csv"
     loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
     numDatos = length(loadData)
-    x = zeros(1,numDatos)
-    y = zeros(1,numDatos)
+    x = zeros(1, numDatos)
+    y = zeros(1, numDatos)
     for i = 1:numDatos
         x[i] = loadData[i].Column1
         y[i] = loadData[i].Column2
@@ -111,7 +111,7 @@ elseif idPredio == 8
 
     dcn.SEPMIN = 5 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
     dcn.ANTEJARDIN = 5 # ANTEJARDIN (m) 
-    dcn.ALTURAMAX = 60 #47 # 24, #ALTURAMAX (m)
+    dcn.ALTURAMAX = 60 # 47 # 24, #ALTURAMAX (m)
     dcn.MAXPISOS = 40 # 9, #MAXPISOS (unidades)
     dcn.COEFOCUPACION = .4 # COEFOCUPACION (m2 / m2 de terreno)
     dcn.SUBPREDIALMIN = 1000 # SUBPREDIALMIN (m2)
@@ -127,8 +127,8 @@ elseif idPredio == 8
     nombreArchivo = "predioLaFlorida2.csv"
     loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
     numDatos = length(loadData)
-    x = zeros(1,numDatos)
-    y = zeros(1,numDatos)
+    x = zeros(1, numDatos)
+    y = zeros(1, numDatos)
     for i = 1:numDatos
         x[i] = loadData[i].Column1
         y[i] = loadData[i].Column2
@@ -148,7 +148,7 @@ elseif idPredio == 9
 
     dcn.SEPMIN = 8 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
     dcn.ANTEJARDIN = 7 # ANTEJARDIN (m) 
-    dcn.ALTURAMAX = 52.5 #47 # 24, #ALTURAMAX (m)
+    dcn.ALTURAMAX = 52.5 # 47 # 24, #ALTURAMAX (m)
     dcn.MAXPISOS = 15 # 9, #MAXPISOS (unidades)
     dcn.COEFOCUPACION = .3 # COEFOCUPACION (m2 de base / m2 de terreno)
     dcn.SUBPREDIALMIN = 1500 # SUBPREDIALMIN (m2)
@@ -171,11 +171,11 @@ elseif idPredio == 9
     dca.PORCSUPCOMUN = .2 # PORCSUPCOMUN (m2 / m2 útil)
 
     nombreArchivo = "el_dante_2.csv"
-    #nombreArchivo = "predio_ElDante.csv"
+    # nombreArchivo = "predio_ElDante.csv"
     loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
     numDatos = length(loadData)
-    x = zeros(1,numDatos)
-    y = zeros(1,numDatos)
+    x = zeros(1, numDatos)
+    y = zeros(1, numDatos)
     for i = 1:numDatos
         x[i] = loadData[i].Column1
         y[i] = loadData[i].Column2
@@ -194,9 +194,40 @@ elseif idPredio == 9
 end
 
         
-
-resultados, ps_predio, ps_base, xopt_cs, fopt_cs, polyCorte,
+resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
+ps_volteor, matConexionVertices_ss, vecVertices_ss,
+ps_restSombra, matConexionVertices_cs, vecVertices_cs,
+xopt_cs, fopt_cs, 
 ps_SombraVolTeor_p, ps_sombraEdif_p, 
-ps_SombraVolTeor_o, ps_sombraEdif_o, 
-ps_SombraVolTeor_s, ps_sombraEdif_s = executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoTemplates);
+ps_SombraVolTeor_s, ps_sombraEdif_s, 
+ps_SombraVolTeor_o, ps_sombraEdif_o = executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoTemplates);
 
+fpe = FlagPlotEdif3D(
+        true, # predio
+        true, # volTeor
+        true, # restSombra
+        true, # edif
+        false, # sombraVolTeor_p
+        false, # sombraVolTeor_o
+        false, # sombraVolTeor_s
+        false, # sombraEdif_p
+        false, # sombraEdif_o
+        false  # sombraEdif_s
+)
+
+fig = plotBaseEdificio3d(fpe, xopt_cs, dca.ALTURAPISO, ps_predio, 
+ps_volteor, matConexionVertices_ss, vecVertices_ss, 
+ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
+ps_publico, ps_calles, ps_base, ps_baseSeparada);
+
+resultados_ = [resultados.SalidaNormativa, 
+                resultados.SalidaArquitectonica, 
+                resultados.SalidaIndicadores, 
+                resultados.SalidaTerreno, 
+                resultados.SalidaOptimizacion, 
+                resultados.SalidaMonetaria, 
+                resultados.SalidaFlujoCaja, [xopt_cs]]
+displayResults(resultados_)
+println(" ")
+println(" ")
+println(" ")
