@@ -75,6 +75,7 @@ mutable struct datosCabidaNormativa
     SEPMIN
     ANTEJARDIN
     RASANTE
+    RASANTE_AUX
     ALTURAMAX
     MAXPISOS
     COEFOCUPACION

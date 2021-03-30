@@ -4,13 +4,14 @@ function ajusteArea(V, areaSup)
     fmax = 110000
 
     cond = true
+    areaCalc = 0
     while cond
         factor = (fmin + fmax)/2
         V_ = factor .* copy(V)
         areaCalc = poly2D.polyArea(V_)
         if abs(areaCalc - areaSup) <= 1
             cond = false
-            return factor        
+            return factor, areaCalc        
         elseif areaCalc <= areaSup
             fmin = factor
             factor = (factor + fmax)/2
@@ -20,5 +21,5 @@ function ajusteArea(V, areaSup)
         end
     end
 
-    return factor
+    return factor, areaCalc
 end

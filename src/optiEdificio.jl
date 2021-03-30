@@ -304,6 +304,7 @@ function optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, su
         sa = nothing
         si = nothing
         st = nothing
+        so = nothing
         sm = nothing
         sf = nothing
     end

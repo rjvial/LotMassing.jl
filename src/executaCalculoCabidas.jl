@@ -40,7 +40,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     matConexionVertices_ss, vecVertices_ss, ps_volteor = generaVol3d(V_predio, V_bruto, rasante_ss, dcn, dcp)
     V_volteor = ps_volteor.Vertices[1]
     ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
-    rasante_cs = 5;
+    rasante_cs = dcn.RASANTE_AUX;
     matConexionVertices_cs, vecVertices_cs, ps_restSombra = generaVol3d(V_predio, V_bruto, rasante_cs, dcn, dcp)
     V_restSombra = ps_restSombra.Vertices[1]
 
@@ -161,7 +161,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         a1 = 12#6
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 1
-        @showprogress 1 "Cálculo Inicial......." for k = 1:a1-1
+        @showprogress 1 "Exploración de Soluciones...." for k = 1:a1-1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
             x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)
@@ -178,7 +178,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         MaxSteps_2 = 20000
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
-        @showprogress 1 "Cálculo más Preciso..." for k = 1:a2
+        @showprogress 1 "Optimización Focalizada......" for k = 1:a2
             if k <= a2-1
                 lb[2] = linSpace2[k]
                 ub[2] = linSpace2[k+1]

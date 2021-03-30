@@ -56,6 +56,19 @@ map.on('load', function () {
     map.on('draw.delete', updateArea);
     map.on('draw.update', updateArea);
 
+    
+    afterMap.on()
+    // Add draw controls
+    var draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: { polygon: true, trash: true }
+    });
+    afterMap.addControl(draw, 'top-right');
+    afterMap.on('draw.create', updateArea);
+    afterMap.on('draw.delete', updateArea);
+    afterMap.on('draw.update', updateArea);
+
+
     // make a pointer cursor
     map.getCanvas().style.cursor = 'default';
 

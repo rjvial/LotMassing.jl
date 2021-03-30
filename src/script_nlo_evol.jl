@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 6 # 8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [1] # 4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 7 # 8 predio = 1,2,3,4,5,6,7,8
+conjuntoTemplates = [3] # 4 [1:L, 2:C, 3:lll, 4:V]
 
 @load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr
 
@@ -71,14 +71,16 @@ elseif idPredio == 6
 elseif idPredio == 7
     # EJEMPLO 7 (Independencia)
 
-    dcn.SEPMIN = 5 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
-    dcn.ANTEJARDIN = 5 # ANTEJARDIN (m) 
-    dcn.ALTURAMAX = 30 # 24, #ALTURAMAX (m)
-    dcn.MAXPISOS = 20 # 9, #MAXPISOS (unidades)
-    dcn.COEFOCUPACION = .5 # COEFOCUPACION (m2 / m2 de terreno)
-    dcn.SUBPREDIALMIN = 300 # SUBPREDIALMIN (m2)
-    dcn.DENSIDADMAX = 2000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
-    dcn.COEFCONSTRUCTIBILIDAD = 3 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
+    dcn.SEPMIN = 4 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
+    dcn.ANTEJARDIN = 0 # ANTEJARDIN (m) 
+    dcn.RASANTE = 1.732 # RASANTE (= tan(60*pi/180))
+    dcn.RASANTE_AUX = 4 # RASANTE_AUX
+    dcn.ALTURAMAX = 90 # 24, #ALTURAMAX (m)
+    dcn.MAXPISOS = 30 # 9, #MAXPISOS (unidades)
+    dcn.COEFOCUPACION = .6 # COEFOCUPACION (m2 / m2 de terreno)
+    dcn.SUBPREDIALMIN = 250 # SUBPREDIALMIN (m2)
+    dcn.DENSIDADMAX = 4000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
+    dcn.COEFCONSTRUCTIBILIDAD = 5 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
 
     dca.ANCHOMAX = 10 # ANCHOMAX (m)
 
@@ -87,11 +89,11 @@ elseif idPredio == 7
 
     dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-    dcc.MAXPORCTIPODEPTO = [.50, .10, .33, .18] # MAXPORCTIPODEPTO  
+    dcc.MAXPORCTIPODEPTO = [1, 1, 1, 1] # MAXPORCTIPODEPTO  
     dcr = datosCabidaRentabilidad(1.15) # RetornoExigido
 
-    nombreArchivo = "Independencia.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/Downloads/", nombreArchivo); header=false)
+    nombreArchivo = "cerrillos.csv"
+    loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1, numDatos)
     y = zeros(1, numDatos)
@@ -103,8 +105,9 @@ elseif idPredio == 7
     x = x[2:end]
     y = y[2:end]
     V = [x y]
-    factorCorreccion = ajusteArea(V, areaSup)
-    dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1 4], [16.5 13.7], 1, 200);
+    factorCorreccion = factorIgualaArea(V, areaSup)
+
+    dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1], [12], 1, 200);
 
 elseif idPredio == 8
     # EJEMPLO 7 (La Florida)
@@ -207,12 +210,12 @@ fpe = FlagPlotEdif3D(
         true, # volTeor
         true, # restSombra
         true, # edif
-        false, # sombraVolTeor_p
-        false, # sombraVolTeor_o
-        false, # sombraVolTeor_s
-        false, # sombraEdif_p
-        false, # sombraEdif_o
-        false  # sombraEdif_s
+        true, # sombraVolTeor_p
+        true, # sombraVolTeor_o
+        true, # sombraVolTeor_s
+        true, # sombraEdif_p
+        true, # sombraEdif_o
+        true  # sombraEdif_s
 )
 
 fig = plotBaseEdificio3d(fpe, xopt_cs, dca.ALTURAPISO, ps_predio, 
