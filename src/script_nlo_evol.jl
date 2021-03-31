@@ -18,6 +18,8 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 idPredio = 2 # 8 predio = 1,2,3,4,5,6,7,9
 conjuntoTemplates = [4] # 4 [1:L, 2:C, 3:lll, 4:V]
 
+dirTerrenos = string(pwd(), "\\", "src", "\\")
+
 @load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr
 
 if idPredio == 1
@@ -93,7 +95,7 @@ elseif idPredio == 7
     dcr = datosCabidaRentabilidad(1.15) # RetornoExigido
 
     nombreArchivo = "cerrillos.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
+    loadData = CSV.File(string(dirTerrenos, nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1, numDatos)
     y = zeros(1, numDatos)
@@ -110,8 +112,6 @@ elseif idPredio == 7
     dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1], [12], 1, 200);
 
 elseif idPredio == 8
-
-    
 
 
 elseif idPredio == 9
@@ -143,7 +143,7 @@ elseif idPredio == 9
 
     nombreArchivo = "el_dante_2.csv"
     # nombreArchivo = "predio_ElDante.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
+    loadData = CSV.File(string(dirTerrenos, nombreArchivo); header=false)
     numDatos = length(loadData)
     x = zeros(1, numDatos)
     y = zeros(1, numDatos)
