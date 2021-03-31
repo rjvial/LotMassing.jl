@@ -107,6 +107,8 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         min_largo = sepNaves; max_largo = 100; 
         min_largo1 = sepNaves; max_largo1 = 100;
         min_largo2 = sepNaves; max_largo2 = 100;
+        min_largo1_ = sepNaves; max_largo1_ = 100;
+        min_largo2_ = sepNaves; max_largo2_ = 100;
 
         xmin = minimum(V_areaEdif[:,1]);  xmax = maximum(V_areaEdif[:,1]);
         ymin = minimum(V_areaEdif[:,2]);  ymax = maximum(V_areaEdif[:,2]);
@@ -147,7 +149,15 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
 
             lb = [min_alt, min_theta, xmin, ymin, min_alfa, min_largo1, min_largo2, min_ancho];
             ub = [max_alt, max_theta, xmax, ymax, max_alfa, max_largo1, max_largo2, max_ancho];
- 
+
+        elseif t == 5
+            largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
+            maxDiagonal = maximum(largosDiag)
+
+            lb = [min_alt, min_theta, xmin, ymin, min_largo, min_largo1_, min_largo1, min_largo2_, min_largo2, min_ancho];
+            ub = [max_alt, max_theta, xmax, ymax, max_largo, max_largo1_, max_largo1, max_largo2_, max_largo2, max_ancho];
+
+
         end
 
         

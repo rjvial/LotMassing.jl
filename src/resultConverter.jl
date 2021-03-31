@@ -164,7 +164,49 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps_base = polyShape.polyUnion_v2(ps1, ps2)
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
-     
+
+    elseif template == 5
+
+        pos_x = x[3]
+        pos_y = x[4]
+        largo = x[5]    
+        largo1_ = x[6] #
+        largo1 = x[7] #
+        largo2_ = x[8] #
+        largo2 = x[9] #
+        anchoLado = x[10] 
+    
+        R = poly2D.rotationMatrix(theta);
+        cr = [pos_x; pos_y]
+
+        p1_1 = R * ([pos_x; pos_y] - cr) + cr;
+        p2_1 = R * ([pos_x + largo1; pos_y] - cr) + cr;
+        p3_1 = R * ([pos_x + largo1; pos_y + anchoLado] - cr) + cr;
+        p4_1 = R * ([pos_x ; pos_y + anchoLado] - cr) + cr;
+        
+        p1_2 = R * ([pos_x + largo1_; pos_y + anchoLado] - cr) + cr;
+        p2_2 = R * ([pos_x + largo1_ + anchoLado; pos_y + anchoLado] - cr) + cr;
+        p3_2 = R * ([pos_x + largo1_ + anchoLado; pos_y + anchoLado + largo] - cr) + cr;
+        p4_2 = R * ([pos_x + largo1_; pos_y + anchoLado + largo] - cr) + cr;
+
+        p1_3 = R * ([pos_x + largo1_ - largo2_; pos_y + anchoLado + largo] - cr) + cr;
+        p2_3 = R * ([pos_x + largo1_ - largo2_ + largo2; pos_y + anchoLado + largo] - cr) + cr;
+        p3_3 = R * ([pos_x + largo1_ - largo2_ + largo2; pos_y + 2*anchoLado + largo] - cr) + cr;
+        p4_3 = R * ([pos_x + largo1_ - largo2_; pos_y + 2*anchoLado + largo] - cr) + cr;
+
+        V1 = [p1_1';p2_1';p3_1';p4_1'];
+        V2 = [p1_2';p2_2';p3_2';p4_2'];        
+        V3 = [p1_3';p2_3';p3_3';p4_3'];        
+
+        ps1 = PolyShape([V1], 1)
+        ps2 = PolyShape([V2], 1)
+        ps3 = PolyShape([V3], 1)
+        
+        ps_base = polyShape.polyUnion_v2(ps1, ps2)
+        ps_base = polyShape.polyUnion_v2(ps_base, ps3)
+        ps_baseSeparada = PolyShape([V1, V2, V3], 3)
+
+
     end
     areaBasal = polyShape.polyArea_v2(ps_base)
     psCorte = PolyShape([polyCorte_alt], 1)

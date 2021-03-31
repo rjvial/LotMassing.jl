@@ -16,7 +16,7 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 ##############################################
 
 idPredio = 2 # 8 predio = 1,2,3,4,5,6,7,9
-conjuntoTemplates = [4] # 4 [1:L, 2:C, 3:lll, 4:V]
+conjuntoTemplates = [5] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
 dirTerrenos = string(pwd(), "\\", "src", "\\")
 
