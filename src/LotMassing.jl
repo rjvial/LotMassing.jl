@@ -3,32 +3,16 @@ module LotMassing
 using NPFinancial, JuMP, GAMS, Polyhedra, BlackBoxOptim, Random, ProgressMeter, Cbc
 
 
-
-
 mutable struct RotInfo
     mat
     cr
     theta
 end
 
+
 mutable struct SubPoly
     points
     ladoComun
-end
-
-mutable struct PolyData
-    V
-    A
-    b
-    proyeccion
-end
-
-mutable struct ConstraintData
-    V
-    k
-    A
-    b
-    norm
 end
 
 
@@ -40,7 +24,7 @@ end
 mutable struct FlagPlotEdif3D
     predio
     volTeor
-    restSombra
+    volRestSombra
     edif
     sombraVolTeor_p
     sombraVolTeor_o
@@ -72,10 +56,10 @@ mutable struct datosCabidaPredio
 end
 
 mutable struct datosCabidaNormativa
-    SEPMIN
+    DISTANCIAMIENTO
     ANTEJARDIN
     RASANTE
-    RASANTE_AUX
+    RASANTESOMBRA
     ALTURAMAX
     MAXPISOS
     COEFOCUPACION
@@ -282,78 +266,15 @@ struct salidaFlujoCaja
     TirApalancadoAntesImpuestos
 end
 
-struct salidaGeometria
-    config
-    celdasConfig
-    p1
-    p2
-    p3
-    p4
-    pos_x
-    pos_y
-    largo
-end
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
-         datosCabidaFlujo, datosCabidaRentabilidad, RotInfo, SubPoly, PolyData, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
-         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, salidaGeometria, PolyShape, FlagPlotEdif3D, ConstraintData,
-         ResultadoCabida
-
-struct particulaPso
-    pos_x
-    pos_y
-    largo_x
-    largo_y
-    theta
-    alt
-end
-
-struct polyPso
-    poly
-    Rmat
-    cr
-    p_1
-    p_2
-    p_3
-    p_4
-end
-
-export particulaPso, polyPso
+         datosCabidaFlujo, datosCabidaRentabilidad, SubPoly, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
+         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, FlagPlotEdif3D,
+         ResultadoCabida, RotInfo
 
 
-MATCELDASCONF_ = [[1 3 5];
-                  [2 3 4]; #
-                  [1 3 NaN];
-                  [3 5 NaN]; #
-                  [2 3 NaN]; #
-                  [3 4 NaN]; #
-                  [1 NaN NaN];
-                  [2 NaN NaN]]; #
-MATCONFHOR_ = [[1 0 1];
-               [0 1 0];
-               [1 0 NaN];
-               [0 1 NaN];
-               [0 1 NaN];
-               [0 1 NaN];
-               [1 NaN NaN];
-               [0 NaN NaN]];
-
-
-"""
-MATCELDASCONF_ = [[1 3 5];
-                  [1 3 NaN];
-                  [1 NaN NaN]];
-MATCONFHOR_ = [[1 0 1];
-               [1 0 NaN];
-               [1 NaN NaN]];
-"""
-
-export MATCELDASCONF_, MATCONFHOR_
-
-include("generaMatCeldasConf.jl")
 include("infoPredio.jl")
 include("calculaAnguloRotacion.jl")
-include("plotCabidaOptima.jl")
 include("generaCalles.jl")
 include("generaSombraEdificio.jl")
 include("optiEdificio.jl")
@@ -363,17 +284,14 @@ include("poly2D.jl")
 include("polyShape.jl")
 include("evol.jl")
 include("resultConverter.jl")
-include("executaCalculoCabidas.jl")
+include("ejecutaCalculoCabidas.jl")
 include("generaVol3d.jl")
 include("generaSombraTeor.jl")
 include("factorIgualaArea.jl")
 include("generaSupBruta.jl")
-include("generaSitiosAleatorios.jl")
-include("ajusteArea.jl")
 
-export generaMatCeldasConf, infoPredio, plotCabidaOptima, calculaAnguloRotacion,
+export infoPredio, calculaAnguloRotacion,
        generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
-       resultConverter, plotBaseEdificio3d, ajusteArea,
-       executaCalculoCabidas, generaVol3d, generaSombraTeor, 
-       generaSupBruta, generaSitiosAleatorios, factorIgualaArea
+       resultConverter, plotBaseEdificio3d, ejecutaCalculoCabidas, generaVol3d, generaSombraTeor, 
+       generaSupBruta, factorIgualaArea
 end

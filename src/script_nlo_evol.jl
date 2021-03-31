@@ -15,8 +15,8 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 7 # 8 predio = 1,2,3,4,5,6,7,8
-conjuntoTemplates = [3] # 4 [1:L, 2:C, 3:lll, 4:V]
+idPredio = 2 # 8 predio = 1,2,3,4,5,6,7,9
+conjuntoTemplates = [4] # 4 [1:L, 2:C, 3:lll, 4:V]
 
 @load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr
 
@@ -71,10 +71,10 @@ elseif idPredio == 6
 elseif idPredio == 7
     # EJEMPLO 7 (Independencia)
 
-    dcn.SEPMIN = 4 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
+    dcn.DISTANCIAMIENTO = 4 # DISTANCIAMIENTO (m): max(4, separación mínima deslindes) OGUC 2.6.3
     dcn.ANTEJARDIN = 0 # ANTEJARDIN (m) 
     dcn.RASANTE = 1.732 # RASANTE (= tan(60*pi/180))
-    dcn.RASANTE_AUX = 4 # RASANTE_AUX
+    dcn.RASANTESOMBRA = 4 # RASANTESOMBRA
     dcn.ALTURAMAX = 90 # 24, #ALTURAMAX (m)
     dcn.MAXPISOS = 30 # 9, #MAXPISOS (unidades)
     dcn.COEFOCUPACION = .6 # COEFOCUPACION (m2 / m2 de terreno)
@@ -110,46 +110,14 @@ elseif idPredio == 7
     dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1], [12], 1, 200);
 
 elseif idPredio == 8
-    # EJEMPLO 7 (La Florida)
 
-    dcn.SEPMIN = 5 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
-    dcn.ANTEJARDIN = 5 # ANTEJARDIN (m) 
-    dcn.ALTURAMAX = 60 # 47 # 24, #ALTURAMAX (m)
-    dcn.MAXPISOS = 40 # 9, #MAXPISOS (unidades)
-    dcn.COEFOCUPACION = .4 # COEFOCUPACION (m2 / m2 de terreno)
-    dcn.SUBPREDIALMIN = 1000 # SUBPREDIALMIN (m2)
-    dcn.DENSIDADMAX = 2000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
-    dcn.COEFCONSTRUCTIBILIDAD = 3.2 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
+    
 
-    dcc.SUPDEPTOUTIL = [20, 35, 45, 55] # SUPDEPTOUTIL (m2)
-    dcc.PRECIOVENTA = [65, 63, 60, 57] # PRECIOVENTA (UF / m2 vendible) 
-    dcc.MAXPORCTIPODEPTO = [0, 1, 1, 1];
-
-    dca.ANCHOMAX = 8 # Ancho Crujía (m)
-
-    nombreArchivo = "predioLaFlorida2.csv"
-    loadData = CSV.File(string("C:/Users/rjvia/.julia/dev/LotMassing/src/", nombreArchivo); header=false)
-    numDatos = length(loadData)
-    x = zeros(1, numDatos)
-    y = zeros(1, numDatos)
-    for i = 1:numDatos
-        x[i] = loadData[i].Column1
-        y[i] = loadData[i].Column2
-    end
-    areaSup = x[1]
-    x = x[2:end]
-    y = y[2:end]
-    V = [x y]
-    V = polyShape.reversePath(V);
-    x = V[1:end,1]
-    y = V[1:end,2]
-    factorCorreccion = ajusteArea(V, areaSup)
-    dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1 3], [17.5 55], 0, 200);
 
 elseif idPredio == 9
     # EJEMPLO 9 (El Dante)
 
-    dcn.SEPMIN = 8 # SEPMIN (m): max(4, separación mínima deslindes) OGUC 2.6.3
+    dcn.DISTANCIAMIENTO = 8 # DISTANCIAMIENTO (m): max(4, separación mínima deslindes) OGUC 2.6.3
     dcn.ANTEJARDIN = 7 # ANTEJARDIN (m) 
     dcn.ALTURAMAX = 52.5 # 47 # 24, #ALTURAMAX (m)
     dcn.MAXPISOS = 15 # 9, #MAXPISOS (unidades)
@@ -198,17 +166,17 @@ end
 
         
 resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
-ps_volteor, matConexionVertices_ss, vecVertices_ss,
-ps_restSombra, matConexionVertices_cs, vecVertices_cs,
-xopt_cs, fopt_cs, 
+ps_volteor, matConexionVertices, vecVertices,
+ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra,
+xopt_restSombra, fopt_restSombra, 
 ps_SombraVolTeor_p, ps_sombraEdif_p, 
 ps_SombraVolTeor_s, ps_sombraEdif_s, 
-ps_SombraVolTeor_o, ps_sombraEdif_o = executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoTemplates);
+ps_SombraVolTeor_o, ps_sombraEdif_o = ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTemplates);
 
 fpe = FlagPlotEdif3D(
         true, # predio
         true, # volTeor
-        true, # restSombra
+        true, # volRestSombra
         true, # edif
         true, # sombraVolTeor_p
         true, # sombraVolTeor_o
@@ -218,9 +186,9 @@ fpe = FlagPlotEdif3D(
         true  # sombraEdif_s
 )
 
-fig = plotBaseEdificio3d(fpe, xopt_cs, dca.ALTURAPISO, ps_predio, 
-ps_volteor, matConexionVertices_ss, vecVertices_ss, 
-ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
+fig = plotBaseEdificio3d(fpe, xopt_restSombra, dca.ALTURAPISO, ps_predio, 
+ps_volteor, matConexionVertices, vecVertices, 
+ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra, 
 ps_publico, ps_calles, ps_base, ps_baseSeparada);
 
 resultados_ = [resultados.SalidaNormativa, 
@@ -229,7 +197,7 @@ resultados_ = [resultados.SalidaNormativa,
                 resultados.SalidaTerreno, 
                 resultados.SalidaOptimizacion, 
                 resultados.SalidaMonetaria, 
-                resultados.SalidaFlujoCaja, [xopt_cs]]
+                resultados.SalidaFlujoCaja, [xopt_restSombra]]
 displayResults(resultados_)
 println(" ")
 println(" ")

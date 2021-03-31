@@ -6,7 +6,7 @@ function generaVol3d(V_predio, V_bruto, rasante, dcn, dcp)
     numCalles = length(conjuntoLadosCalle)
     conjuntoLadosVecinos = setdiff(conjuntoLados, conjuntoLadosCalle);
     alturaMax = dcn.ALTURAMAX
-    sepVecinos = dcn.SEPMIN
+    sepVecinos = dcn.DISTANCIAMIENTO
     antejardin = dcn.ANTEJARDIN
     anchoEspacioPublico = dcp.ANCHOESPACIOPUBLICO
 

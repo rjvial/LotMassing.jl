@@ -1,4 +1,4 @@
-function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoTemplates)
+function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTemplates)
 
 
     numTiposDepto = length(dcc.SUPDEPTOUTIL);
@@ -18,7 +18,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     conjuntoLados = 1:numLadosPredio;
     conjuntoLadosCalle = dcp.ladosConCalle;
     conjuntoLadosVecinos = setdiff(conjuntoLados, conjuntoLadosCalle);
-    sepVecinos = dcn.SEPMIN;
+    sepVecinos = dcn.DISTANCIAMIENTO;
     rasante = dcn.RASANTE; 
     alturaMax = dcn.ALTURAMAX
     anchoEspacioPublico = dcp.ANCHOESPACIOPUBLICO
@@ -36,20 +36,19 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
 
 
     # Calcula el volumen y sombra teórica 
-    rasante_ss = rasante; 
-    matConexionVertices_ss, vecVertices_ss, ps_volteor = generaVol3d(V_predio, V_bruto, rasante_ss, dcn, dcp)
+    matConexionVertices, vecVertices, ps_volteor = generaVol3d(V_predio, V_bruto, rasante, dcn, dcp)
     V_volteor = ps_volteor.Vertices[1]
-    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
-    rasante_cs = dcn.RASANTE_AUX;
-    matConexionVertices_cs, vecVertices_cs, ps_restSombra = generaVol3d(V_predio, V_bruto, rasante_cs, dcn, dcp)
-    V_restSombra = ps_restSombra.Vertices[1]
+    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices, vecVertices, ps_publico, ps_calles)
+    rasante_sombra = dcn.RASANTESOMBRA;
+    matConexionVertices_restSombra, vecVertices_restSombra, ps_volRestSombra = generaVol3d(V_predio, V_bruto, rasante_sombra, dcn, dcp)
+    V_volRestSombra = ps_volRestSombra.Vertices[1]
 
     areaSombra_p = polyShape.polyArea_v2(ps_SombraVolTeor_p)
     areaSombra_o = polyShape.polyArea_v2(ps_SombraVolTeor_o)
     areaSombra_s = polyShape.polyArea_v2(ps_SombraVolTeor_s)
 
-    vecAlturas_cs = sort(unique(V_restSombra[:,end]))
-    altCorteVecinos = dcn.RASANTE * dcn.SEPMIN
+    vecAlturas_restSombra = sort(unique(V_volRestSombra[:,end]))
+    altCorteVecinos = dcn.RASANTE * dcn.DISTANCIAMIENTO
     numVertices = size(V_areaEdif, 1);
     sepNaves = dca.ANCHOMAX
 
@@ -59,9 +58,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     maxDeptos = dcn.DENSIDADMAX / 4 * superficieDensidad / 10000;
     maxSupConstruidaDensidad = maxDeptos*maximum(dcc.SUPDEPTOUTIL) * (1 + dca.PORCSUPCOMUN)
 
-    function fitness_cs(x)  # Función de Fitness Con Sombra
+    function fitness_restSombra(x)  # Función de Fitness Con Sombra
 
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(x, t, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(x, t, V_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra, vecAlturas_restSombra, sepNaves)
         
         total_fit = 0
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
@@ -102,7 +101,7 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         cont += 1
 
         display("Inicio de Cálculo")
-        min_alt = min(maximum(vecAlturas_cs), dcn.RASANTE * dcn.SEPMIN); max_alt = maximum(vecAlturas_cs)
+        min_alt = min(maximum(vecAlturas_restSombra), dcn.RASANTE * dcn.DISTANCIAMIENTO); max_alt = maximum(vecAlturas_restSombra)
         min_theta = pi/2; max_theta =  pi;
 
         min_largo = sepNaves; max_largo = 100; 
@@ -155,8 +154,8 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         MaxStepsWithoutProgress = 5000
 
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
-        fopt_cs = 10000
-        xopt_cs = []
+        fopt_restSombra = 10000
+        xopt_restSombra = []
         MaxSteps_1 = 15000#18000
         a1 = 12#6
         linSpace1 = collect(range(-pi, pi, length = a1))
@@ -164,10 +163,10 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
         @showprogress 1 "Exploración de Soluciones...." for k = 1:a1-1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
-            x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)
-            if f_k < fopt_cs
-                fopt_cs = f_k
-                xopt_cs = x_k
+            x_k, f_k = evol(fitness_restSombra, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)
+            if f_k < fopt_restSombra
+                fopt_restSombra = f_k
+                xopt_restSombra = x_k
                 kopt1 = k
             end
         end
@@ -182,27 +181,27 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
             if k <= a2-1
                 lb[2] = linSpace2[k]
                 ub[2] = linSpace2[k+1]
-                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_2, MaxStepsWithoutProgress, false)
+                x_k, f_k = evol(fitness_restSombra, lb, ub, MaxSteps_2, MaxStepsWithoutProgress, false)
             else
                 lb[2] = linSpace2[kopt2]
                 ub[2] = linSpace2[kopt2+1]
-                x_k, f_k = evol(fitness_cs, lb, ub, MaxSteps_2*2, MaxStepsWithoutProgress, false)
+                x_k, f_k = evol(fitness_restSombra, lb, ub, MaxSteps_2*2, MaxStepsWithoutProgress, false)
             end
-            if f_k < fopt_cs
-                fopt_cs = f_k
-                xopt_cs = x_k
+            if f_k < fopt_restSombra
+                fopt_restSombra = f_k
+                xopt_restSombra = x_k
                 kopt2 = k
             end
         end
 
         
-        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_cs, t, V_restSombra, matConexionVertices_cs, vecVertices_cs, vecAlturas_cs, sepNaves)
+        alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(xopt_restSombra, t, V_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra, vecAlturas_restSombra, sepNaves)
         numPisos = Int(floor(alt / dca.ALTURAPISO))
         alturaEdif = numPisos * dca.ALTURAPISO
         sn, sa, si, st, so, sm, sf = optiEdificio(dcn, dca, dcp, dcc, dcu, dcf, dcr, alturaEdif, ps_base, superficieTerreno, superficieTerrenoBruta)
-        xopt_cs[1] = sa.altura 
+        xopt_restSombra[1] = sa.altura 
         numPisos = sa.numPisos
-        resultados = ResultadoCabida(sn, sa, si, st, sm, so, sf, [xopt_cs])
+        resultados = ResultadoCabida(sn, sa, si, st, sm, so, sf, [xopt_restSombra])
         
 
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
@@ -211,9 +210,9 @@ function executaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, fpe, conjuntoT
     end
     
     return resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
-            ps_volteor, matConexionVertices_ss, vecVertices_ss,
-            ps_restSombra, matConexionVertices_cs, vecVertices_cs,
-            xopt_cs, fopt_cs, 
+            ps_volteor, matConexionVertices, vecVertices,
+            ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra,
+            xopt_restSombra, fopt_restSombra, 
             ps_SombraVolTeor_p, ps_sombraEdif_p, 
             ps_SombraVolTeor_s, ps_sombraEdif_s, 
             ps_SombraVolTeor_o, ps_sombraEdif_o
