@@ -1,11 +1,11 @@
 function plotBaseEdificio3d(fpe, x, alturaPiso, ps_predio,
-                             ps_volteor, matConexionVertices_ss, vecVertices_ss, 
-                            ps_restSombra, matConexionVertices_cs, vecVertices_cs, 
+                             ps_volteor, matConexionVertices, vecVertices, 
+                            ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra, 
                             ps_publico, ps_calles, ps_base, ps_baseSeparada)
 
     f_predio = fpe.predio
     f_volTeor = fpe.volTeor
-    f_restSombra = fpe.restSombra
+    f_volRestSombra = fpe.volRestSombra
     f_edif = fpe.edif
 
     f_sombraVolTeor_p = fpe.sombraVolTeor_p
@@ -27,13 +27,13 @@ function plotBaseEdificio3d(fpe, x, alturaPiso, ps_predio,
     if f_volTeor
         # Grafica Volumen Teórico
         V_volteor = ps_volteor.Vertices[1]
-        fig, ax, ax_mat = polyShape.plotPolyshape3d_v5(ps_volteor, matConexionVertices_ss, vecVertices_ss, fig, ax, ax_mat)
+        fig, ax, ax_mat = polyShape.plotPolyshape3d_v5(ps_volteor, matConexionVertices, vecVertices, fig, ax, ax_mat)
     end
 
-    if f_restSombra
+    if f_volRestSombra
         # Grafica Volumen Teórico
-        V_restSombra = ps_restSombra.Vertices[1]
-        fig, ax, ax_mat = polyShape.plotPolyshape3d_v5(ps_restSombra, matConexionVertices_cs, vecVertices_cs, fig, ax, ax_mat, "gray", 0.1)
+        V_volRestSombra = ps_volRestSombra.Vertices[1]
+        fig, ax, ax_mat = polyShape.plotPolyshape3d_v5(ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra, fig, ax, ax_mat, "gray", 0.1)
     end
 
     #ps_calles = polyShape.polyUnion_v2(ps_calles, ps_calles)
@@ -55,7 +55,7 @@ function plotBaseEdificio3d(fpe, x, alturaPiso, ps_predio,
     end
 
     
-    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices_ss, vecVertices_ss, ps_publico, ps_calles)
+    ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s = generaSombraTeor(ps_volteor, matConexionVertices, vecVertices, ps_publico, ps_calles)
     if f_sombraVolTeor_p
         fig, ax, ax_mat = polyShape.plotPolyshape3d_v3(ps_SombraVolTeor_p, 0, fig, ax, ax_mat, "gold", 0.3)
     end
