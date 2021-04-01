@@ -25,7 +25,6 @@ dirTerrenos = string(pwd(), "\\", "src", "\\")
 if idPredio == 1
     dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-
     factorCorreccion = 2;
     x = factorCorreccion * [0 30 40 45 10]';
     y = factorCorreccion * [10 0 15 35 30]';
@@ -83,12 +82,9 @@ elseif idPredio == 7
     dcn.SUBPREDIALMIN = 250 # SUBPREDIALMIN (m2)
     dcn.DENSIDADMAX = 4000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
     dcn.COEFCONSTRUCTIBILIDAD = 5 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
-
     dca.ANCHOMAX = 10 # ANCHOMAX (m)
-
     # dcc.SUPDEPTOUTIL = [20, 35, 50, 60] # SUPDEPTOUTIL (m2)
     # dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-
     dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
     dcc.MAXPORCTIPODEPTO = [1, 1, 1, 1] # MAXPORCTIPODEPTO  
@@ -108,7 +104,6 @@ elseif idPredio == 7
     y = y[2:end]
     V = [x y]
     factorCorreccion = factorIgualaArea(V, areaSup)
-
     dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1], [12], 1, 200);
 
 elseif idPredio == 8
@@ -128,7 +123,6 @@ elseif idPredio == 9
     dcn.COEFCONSTRUCTIBILIDAD = 2.8 # COEFCONSTRUCTIBILIDAD (m2 de Sup. Util/ m2 de terreno)
     dcn.ESTACIONAMIENTOSPORVIV = [1.5, 1.5, 1.5, 2] # ESTACIONAMIENTOSPORVIV
     dcn.FLAGCAMBIOESTPORBICICLETA = true # FLAGCAMBIOESTPORBICICLETA
-
     dcc.SUPDEPTOUTIL = [50, 90, 110, 140] # SUPDEPTOUTIL (m2)
     dcc.PRECIOVENTA = [95, 91, 89, 87] # PRECIOVENTA (UF / m2 vendible) 
     dcc.MAXPORCTIPODEPTO = [1, 1, 1, 1];
@@ -158,7 +152,6 @@ elseif idPredio == 9
     factorCorreccion = factorIgualaArea(V, areaSup)
     x = factorCorreccion * x
     y = factorCorreccion * y
-    
     dcp = datosCabidaPredio(x, y, [1,2,3], [15,15,15], 0, 200);
 #    dcp = datosCabidaPredio(x, y, [1,2,3,4,5,6], [15,15,15,15,15,20], 0, 200);
 
