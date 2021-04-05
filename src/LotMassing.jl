@@ -83,9 +83,8 @@ mutable struct datosCabidaArquitectura
     ALTURAPISO
     PORCSUPCOMUN
     PORCTERRAZA
+    ANCHOMIN
     ANCHOMAX
-    MATCELDASCONF
-    MATCONFHOR
 end
 
 mutable struct datosCabidaComercial

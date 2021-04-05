@@ -113,7 +113,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         xmin = minimum(V_areaEdif[:,1]);  xmax = maximum(V_areaEdif[:,1]);
         ymin = minimum(V_areaEdif[:,2]);  ymax = maximum(V_areaEdif[:,2]);
 
-        min_ancho = 6; max_ancho = 16;
+        min_ancho = dca.ANCHOMIN; max_ancho = dca.ANCHOMAX;
 
 
         if t == 1
