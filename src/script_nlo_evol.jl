@@ -15,7 +15,7 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 1 # 8 predio = 1,2,3,4,5,6,7,9
+idPredio = 5 # 8 predio = 1,2,3,4,5,6,7,9
 conjuntoTemplates = [5] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
 dirTerrenos = string(pwd(), "\\", "src", "\\")
@@ -82,7 +82,7 @@ elseif idPredio == 7
     dcn.SUBPREDIALMIN = 250 # SUBPREDIALMIN (m2)
     dcn.DENSIDADMAX = 4000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
     dcn.COEFCONSTRUCTIBILIDAD = 5 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
-    dca.ANCHOMAX = 10 # ANCHOMAX (m)
+    dca.ANCHOMAX = 16 # ANCHOMAX (m)
     # dcc.SUPDEPTOUTIL = [20, 35, 50, 60] # SUPDEPTOUTIL (m2)
     # dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
     dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
@@ -131,7 +131,7 @@ elseif idPredio == 9
     dcu.LosaSNT = 30 # LosaSNT 
     dcu.LosaBNT = 12 # LosaBNT 
 
-    dca.ANCHOMAX = 8 # Ancho Crujía (m)
+    dca.ANCHOMAX = 16 # Ancho Crujía (m)
     dca.ALTURAPISO = 2.7 # 2.625, # ALTURAPISO (m / piso)
     dca.PORCSUPCOMUN = .2 # PORCSUPCOMUN (m2 / m2 útil)
 

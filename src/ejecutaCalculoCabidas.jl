@@ -7,7 +7,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     V_predio, R = infoPredio(dcp.x, dcp.y);
     ps_predio = PolyShape([V_predio], 1)
     # Corrección por expropiación #
-    ps_predio = polyShape.polyExpandSides_v2(ps_predio, [-1.5, -1.5, -1.5], [1, 2, 3]) 
+    #ps_predio = polyShape.polyExpandSides_v2(ps_predio, [-1.5, -1.5, -1.5], [1, 2, 3]) 
     # #############################
     superficieTerreno = polyShape.polyArea_v2(ps_predio);
        
@@ -32,8 +32,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     superficieTerrenoBruta = polyShape.polyArea_v2(ps_bruto);
     ps_calles = generaCalles(ps_predio, ps_publico, anchoEspacioPublico)
     V_bruto = ps_bruto.Vertices[1]
-    V_publico = ps_publico.Vertices[1]
-
+    
 
     # Calcula el volumen y sombra teórica 
     matConexionVertices, vecVertices, ps_volteor = generaVol3d(V_predio, V_bruto, rasante, dcn, dcp)
@@ -89,9 +88,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         return -total_fit
     end
 
-    numParticles = 4000# 2000;
-    maxIterations = 300# 300;
-
+    
     
     @time begin
         cont = 0
