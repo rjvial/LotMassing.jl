@@ -32,6 +32,7 @@ mutable struct FlagPlotEdif3D
     sombraEdif_p
     sombraEdif_o
     sombraEdif_s
+    FlagPlotEdif3D() = new()
 end
 
 mutable struct ResultadoCabida
@@ -77,6 +78,7 @@ mutable struct datosCabidaNormativa
     COEFOCUPACIONEST
     SEPESTMIN
     REDUCCIONESTPORDISTMETRO
+    datosCabidaNormativa() = new()
 end
 
 mutable struct datosCabidaArquitectura
@@ -85,6 +87,7 @@ mutable struct datosCabidaArquitectura
     PORCTERRAZA
     ANCHOMIN
     ANCHOMAX
+    datosCabidaArquitectura() = new()
 end
 
 mutable struct datosCabidaComercial
@@ -139,6 +142,7 @@ mutable struct datosCabidaUnit
     PostVentaInmobiliaria
     SeguroVentaEnVerde    
     Imprevistos
+    datosCabidaUnit() = new()
 end
 
 # flujos corresponden a meses: 0 6 12 18 24 30

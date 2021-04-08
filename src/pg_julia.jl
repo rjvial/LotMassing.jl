@@ -53,7 +53,7 @@ module pg_julia
         return df_out
     end
 
-
+    
     function createTable(conn::LibPQ.Connection, tableNameStr, vecColumnNames, vecColumnType, primaryKeyStr )
         #vecColumnNames = ["DISTANCIAMIENTO", "ANTEJARDIN", "RASANTE", "RASANTESOMBRA", "ALTURAMAX", "MAXPISOS", "COEFOCUPACION", "SUBPREDIALMIN", "DENSIDADMAX", "FLAGDENSIDADBRUTA", "COEFCONSTRUCTIBILIDAD", "ESTACIONAMIENTOSPORVIV", "PORCADICESTACVISITAS", "SUPPORESTACIONAMIENTO", "ESTBICICLETAPOREST", "BICICLETASPOREST", "FLAGCAMBIOESTPORBICICLETA", "MAXSUBTE", "COEFOCUPACIONEST", "SEPESTMIN", "REDUCCIONESTPORDISTMETRO", "id_Normativa"]
         #vecColumnType = ["float8", "float8", "float8", "float8", "float8", "int8", "float8", "float8", "float8", "bool", "float8", "float8", "float8", "float8", "float8", "float8", "bool", "int8", "float8", "float8", "bool", "int8"]
@@ -82,6 +82,7 @@ module pg_julia
         df_out = pg_julia.query(conn, """SELECT * FROM public."$tableNameStr";""")
         return df_out
     end
+
 
     function insertRow!(conn::LibPQ.Connection, tableNameStr::String, vecColumnNames, vecColumnValue, id::Symbol)
         #vecColumnNames = ["DISTANCIAMIENTO", "ANTEJARDIN", "RASANTE", "RASANTESOMBRA", "ALTURAMAX", "MAXPISOS", "COEFOCUPACION", "SUBPREDIALMIN", "DENSIDADMAX", "FLAGDENSIDADBRUTA", "COEFCONSTRUCTIBILIDAD", "ESTACIONAMIENTOSPORVIV", "PORCADICESTACVISITAS", "SUPPORESTACIONAMIENTO", "ESTBICICLETAPOREST", "BICICLETASPOREST", "FLAGCAMBIOESTPORBICICLETA", "MAXSUBTE", "COEFOCUPACIONEST", "SEPESTMIN", "REDUCCIONESTPORDISTMETRO", "id_Normativa"]

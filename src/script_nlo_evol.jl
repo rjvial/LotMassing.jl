@@ -15,12 +15,43 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 # PARTE "2": GENERACIÓN DE PARÁMETROS        #
 ##############################################
 
-idPredio = 5 # 8 predio = 1,2,3,4,5,6,7,9
+idPredio = 1 # 8 predio = 1,2,3,4,5,6,7,9
 conjuntoTemplates = [5] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
 dirTerrenos = string(pwd(), "\\", "src", "\\")
 
-@load "defaults.jld2" fpe dcn dca dcc dcu dcf dcr
+@load "defaults.jld2" dcc dcf dcr
+
+conn = pg_julia.connection("LotMassing", "postgres", "lm4321")
+
+df_normativa = pg_julia.query(conn, """SELECT * FROM public."tabla_normativa_default";""")
+dcn = datosCabidaNormativa()
+for field_s in fieldnames(datosCabidaNormativa)
+    value_ = df_normativa[:, field_s][1]
+    setproperty!(dcn, field_s, value_)
+end
+
+df_arquitectura = pg_julia.query(conn, """SELECT * FROM public."tabla_arquitectura_default";""")
+dca = datosCabidaArquitectura()
+for field_s in fieldnames(datosCabidaArquitectura)
+    value_ = df_arquitectura[:, field_s][1]
+    setproperty!(dca, field_s, value_)
+end
+
+df_costosunitarios = pg_julia.query(conn, """SELECT * FROM public."tabla_costosunitarios_default";""")
+dcu = datosCabidaUnit()
+for field_s in fieldnames(datosCabidaUnit)
+    value_ = df_costosunitarios[:, field_s][1]
+    setproperty!(dcu, field_s, value_)
+end
+
+df_flagplot = pg_julia.query(conn, """SELECT * FROM public."tabla_flagplot_default";""")
+fpe = FlagPlotEdif3D()
+for field_s in fieldnames(FlagPlotEdif3D)
+    value_ = df_flagplot[:, field_s][1]
+    setproperty!(fpe, field_s, value_)
+end
+
 
 if idPredio == 1
     dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
@@ -166,18 +197,6 @@ ps_SombraVolTeor_p, ps_sombraEdif_p,
 ps_SombraVolTeor_s, ps_sombraEdif_s, 
 ps_SombraVolTeor_o, ps_sombraEdif_o = ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTemplates);
 
-fpe = FlagPlotEdif3D(
-        true, # predio
-        true, # volTeor
-        true, # volRestSombra
-        true, # edif
-        true, # sombraVolTeor_p
-        true, # sombraVolTeor_o
-        true, # sombraVolTeor_s
-        true, # sombraEdif_p
-        true, # sombraEdif_o
-        true  # sombraEdif_s
-)
 
 fig = plotBaseEdificio3d(fpe, xopt_restSombra, dca.ALTURAPISO, ps_predio, 
 ps_volteor, matConexionVertices, vecVertices, 
