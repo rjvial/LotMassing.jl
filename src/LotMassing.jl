@@ -10,12 +10,6 @@ mutable struct RotInfo
 end
 
 
-mutable struct SubPoly
-    points
-    ladoComun
-end
-
-
 mutable struct PolyShape
     Vertices
     NumRegions
@@ -271,7 +265,7 @@ end
 
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
-         datosCabidaFlujo, datosCabidaRentabilidad, SubPoly, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
+         datosCabidaFlujo, datosCabidaRentabilidad, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
          salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, FlagPlotEdif3D,
          ResultadoCabida, RotInfo
 
