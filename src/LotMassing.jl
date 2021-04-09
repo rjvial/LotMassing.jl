@@ -10,12 +10,6 @@ mutable struct RotInfo
 end
 
 
-mutable struct SubPoly
-    points
-    ladoComun
-end
-
-
 mutable struct PolyShape
     Vertices
     NumRegions
@@ -32,6 +26,7 @@ mutable struct FlagPlotEdif3D
     sombraEdif_p
     sombraEdif_o
     sombraEdif_s
+    FlagPlotEdif3D() = new()
 end
 
 mutable struct ResultadoCabida
@@ -77,6 +72,7 @@ mutable struct datosCabidaNormativa
     COEFOCUPACIONEST
     SEPESTMIN
     REDUCCIONESTPORDISTMETRO
+    datosCabidaNormativa() = new()
 end
 
 mutable struct datosCabidaArquitectura
@@ -85,6 +81,7 @@ mutable struct datosCabidaArquitectura
     PORCTERRAZA
     ANCHOMIN
     ANCHOMAX
+    datosCabidaArquitectura() = new()
 end
 
 mutable struct datosCabidaComercial
@@ -139,6 +136,7 @@ mutable struct datosCabidaUnit
     PostVentaInmobiliaria
     SeguroVentaEnVerde    
     Imprevistos
+    datosCabidaUnit() = new()
 end
 
 # flujos corresponden a meses: 0 6 12 18 24 30
@@ -267,7 +265,7 @@ end
 
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
-         datosCabidaFlujo, datosCabidaRentabilidad, SubPoly, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
+         datosCabidaFlujo, datosCabidaRentabilidad, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
          salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, FlagPlotEdif3D,
          ResultadoCabida, RotInfo
 
