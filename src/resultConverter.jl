@@ -13,7 +13,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
     polyCorte_alt = alfa_ .* poly_0 .+ (1 - alfa_) .* poly_1
 
 
-    if template == 1
+    if template == 1 #L
 
         pos_x = x[3]
         pos_y = x[4]
@@ -44,7 +44,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps_base = polyShape.polyUnion_v2(ps1, ps2)
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
-    elseif template == 2
+    elseif template == 2 #C
         pos_x0 = x[3]
         pos_y0 = x[4]
         phi1 = x[5]
@@ -88,7 +88,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps_base = polyShape.polyUnion_v2(ps_base, ps2)
         ps_baseSeparada = PolyShape([V0, V1, V2], 3)
 
-    elseif template == 3
+    elseif template == 3 #III
 
         pos_x = x[3]
         pos_y = x[4]
@@ -134,7 +134,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps_base = ps
         ps_baseSeparada = PolyShape(VV, unidades)
 
-    elseif template == 4
+    elseif template == 4 #V
 
         pos_x = x[3]
         pos_y = x[4]
@@ -165,7 +165,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
 
-    elseif template == 5
+    elseif template == 5 #H
 
         pos_x = x[3]
         pos_y = x[4]

@@ -83,9 +83,8 @@ mutable struct datosCabidaArquitectura
     ALTURAPISO
     PORCSUPCOMUN
     PORCTERRAZA
+    ANCHOMIN
     ANCHOMAX
-    MATCELDASCONF
-    MATCONFHOR
 end
 
 mutable struct datosCabidaComercial
@@ -289,9 +288,10 @@ include("generaVol3d.jl")
 include("generaSombraTeor.jl")
 include("factorIgualaArea.jl")
 include("generaSupBruta.jl")
+include("pg_julia.jl")
 
 export infoPredio, calculaAnguloRotacion,
        generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
        resultConverter, plotBaseEdificio3d, ejecutaCalculoCabidas, generaVol3d, generaSombraTeor, 
-       generaSupBruta, factorIgualaArea
+       generaSupBruta, factorIgualaArea, pg_julia
 end
