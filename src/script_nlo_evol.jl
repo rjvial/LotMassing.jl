@@ -16,13 +16,13 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 ##############################################
 
 idPredio = 1 # 8 predio = 1,2,3,4,5,6,7,9
-conjuntoTemplates = [5] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
+conjuntoTemplates = [2] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
 dirTerrenos = string(pwd(), "\\", "src", "\\")
 
 @load "defaults.jld2" dcc dcf dcr
 
-conn = pg_julia.connection("LotMassing", "postgres", "poner_pw")
+conn = pg_julia.connection("LotMassing", "postgres", "postgres")
 
 df_normativa = pg_julia.query(conn, """SELECT * FROM public."tabla_normativa_default";""")
 dcn = datosCabidaNormativa()

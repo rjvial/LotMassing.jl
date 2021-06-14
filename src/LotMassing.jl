@@ -1,6 +1,6 @@
 module LotMassing
 
-using NPFinancial, JuMP, GAMS, Polyhedra, BlackBoxOptim, Random, ProgressMeter, Cbc
+using NPFinancial, JuMP, Polyhedra, BlackBoxOptim, Random, ProgressMeter, Cbc
 
 
 mutable struct RotInfo
