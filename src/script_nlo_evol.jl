@@ -22,7 +22,7 @@ dirTerrenos = string(pwd(), "\\", "src", "\\")
 
 @load "defaults.jld2" dcc dcf dcr
 
-conn = pg_julia.connection("LotMassing", "postgres", "lm4321")
+conn = pg_julia.connection("LotMassing", "postgres", "poner_pw")
 
 df_normativa = pg_julia.query(conn, """SELECT * FROM public."tabla_normativa_default";""")
 dcn = datosCabidaNormativa()
