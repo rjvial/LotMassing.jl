@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, CSV, JLD2
+using LotMassing, .poly2D, .polyShape, CSV, JLD2, FileIO
 
 # Random.seed!(1236)
 # Random.seed!(1230)
@@ -20,32 +20,75 @@ conjuntoTemplates = [2] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
 dirTerrenos = string(pwd(), "\\", "src", "\\")
 
-@load "defaults.jld2" dcc dcf dcr
 
-conn = pg_julia.connection("LotMassing", "postgres", "postgres")
+conn_LotMassing = pg_julia.connection("LotMassing", "postgres", "postgres")
+conn_mygis_db = pg_julia.connection("mygis_db", "postgres", "postgres")
 
-df_normativa = pg_julia.query(conn, """SELECT * FROM public."tabla_normativa_default";""")
+
+f = jldopen("defaults.jld2", "r")
+dcc = f["dcc"]
+dcr = f["dcr"]
+dcf = f["dcf"]
+
+df_normativa = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_normativa_default";""")
 dcn = datosCabidaNormativa()
 for field_s in fieldnames(datosCabidaNormativa)
     value_ = df_normativa[:, field_s][1]
     setproperty!(dcn, field_s, value_)
 end
 
-df_arquitectura = pg_julia.query(conn, """SELECT * FROM public."tabla_arquitectura_default";""")
+
+queryStr = """
+SELECT codigo_predial, sup_terreno_edif, largo_segmentos, zona, densidad_bruta_hab_ha, densidad_neta_viv_ha, subdivision_predial_minima,
+coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
+ocupacion_pisos_superiores_continua, coef_area_libre, rasante, num_pisos_continua, altura_max_continua, num_pisos_sobre_edif_continua,
+altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_sobre_edif_continua, distanciamiento_sobre_edif_continua,
+antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada
+FROM datos_predios_vitacura
+WHERE codigo_predial = 151600243500009
+"""
+df = pg_julia.query(conn_mygis_db, queryStr)
+
+
+dcn.DISTANCIAMIENTO = df.distanciamiento[1]
+dcn.ANTEJARDIN = df.antejardin[1]
+dcn.RASANTE = tan(df.rasante[1]/180*pi)
+dcn.RASANTESOMBRA = 5
+dcn.ALTURAMAX = df.altura_max_total[1]
+dcn.MAXPISOS = df.num_pisos_total[1]
+dcn.COEFOCUPACION = df.ocupacion_suelo[1]
+dcn.SUBPREDIALMIN = df.subdivision_predial_minima[1]
+dcn.DENSIDADMAX = df.densidad_bruta_hab_ha[1]
+dcn.FLAGDENSIDADBRUTA = true
+dcn.COEFCONSTRUCTIBILIDAD = df.coef_constructibilidad[1]
+dcn.ESTACIONAMIENTOSPORVIV = 1
+dcn.PORCADICESTACVISITAS = .15
+dcn.SUPPORESTACIONAMIENTO = 30
+dcn.ESTBICICLETAPOREST = .5
+dcn.BICICLETASPOREST = 3
+dcn.FLAGCAMBIOESTPORBICICLETA = true
+dcn.MAXSUBTE = 7
+dcn.COEFOCUPACIONEST = .8
+dcn.SEPESTMIN = 7
+dcn.REDUCCIONESTPORDISTMETRO = false
+
+
+
+df_arquitectura = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_arquitectura_default";""")
 dca = datosCabidaArquitectura()
 for field_s in fieldnames(datosCabidaArquitectura)
     value_ = df_arquitectura[:, field_s][1]
     setproperty!(dca, field_s, value_)
 end
 
-df_costosunitarios = pg_julia.query(conn, """SELECT * FROM public."tabla_costosunitarios_default";""")
+df_costosunitarios = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_costosunitarios_default";""")
 dcu = datosCabidaUnit()
 for field_s in fieldnames(datosCabidaUnit)
     value_ = df_costosunitarios[:, field_s][1]
     setproperty!(dcu, field_s, value_)
 end
 
-df_flagplot = pg_julia.query(conn, """SELECT * FROM public."tabla_flagplot_default";""")
+df_flagplot = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_flagplot_default";""")
 fpe = FlagPlotEdif3D()
 for field_s in fieldnames(FlagPlotEdif3D)
     value_ = df_flagplot[:, field_s][1]
