@@ -78,8 +78,6 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         numPisos = Int(floor(alt / dca.ALTURAPISO)) 
         penalizacionConstructibilidad = max(0, areaBasal*numPisos - maxSupConstruida)
         penalizacionDensidad = max(0, areaBasal*numPisos - maxSupConstruidaDensidad)
-
-
         total_fit = numPisos * areaBasal - 
                     100 * numPisos * (penalizacionCoefOcup + penalizacion_r) -
                     1000*(penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
@@ -163,8 +161,8 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_restSombra = 10000
         xopt_restSombra = []
-        MaxSteps_1 = 15000#18000
-        a1 = 12#6
+        MaxSteps_1 = 18000#15000
+        a1 = 5
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 1
         @showprogress 1 "Exploración de Soluciones...." for k = 1:a1-1
@@ -180,7 +178,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         lb2_opt = linSpace1[kopt1]
         ub2_opt = linSpace1[kopt1+1]
 
-        a2 = 3#6
+        a2 = 7
         MaxSteps_2 = 20000
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
