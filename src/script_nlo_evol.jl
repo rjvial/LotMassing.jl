@@ -79,6 +79,7 @@ for i = 1:num_vertices
 end
 
 
+
 dcc = datosCabidaComercial([50, 90, 110, 140], [1.0, 1.0, 1.0, 1.0], [95, 92, 90, 89], 200)
 dcr = datosCabidaRentabilidad(1.2)
 dcf = datosCabidaFlujo([0.05, 0.05, 0.05, 0.05, 0.1, 0.7], [1, 0, 0, 0, 0, 0], [0.05, 0.1, 0.35, 0.35, 0.15, 0.0], [0.4, 0.15, 0.15, 0.15, 0.15, 0.0], [0.0, 0.1, 0.2, 0.2, 0.25, 0.25], [0.1, 0.4, 0.25, 0.15, 0.05, 0.05], [0.0, 0.0, 0.0, 0.0, 0.5, 0.5], [0.0, 0.0, 0.0, 0.0, 0.25, 0.75], [0.05, 0.05, 0.05, 0.05, 0.05, 0.75], [0.0, 0.2, 0.2, 0.2, 0.2, 0.2], [0.05, 0.1, 0.35, 0.35, 0.15, 0.0], [0.0, 0.0, 0.1, 0.35, 0.35, 0.2], 0.27, 0.05, 24.0, 15)
@@ -103,16 +104,6 @@ for field_s in fieldnames(FlagPlotEdif3D)
     value_ = df_flagplot[:, field_s][1]
     setproperty!(fpe, field_s, value_)
 end
-
-
-dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
-dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-factorCorreccion = 2;
-x = factorCorreccion * [0 30 40 45 10]';
-y = factorCorreccion * [10 0 15 35 30]';
-# Calle: [4]
-dcp = datosCabidaPredio(x, y, [1 4], [20 20], 1, 200);
-
 
 
 areaSup = df.sup_terreno_edif[1]
