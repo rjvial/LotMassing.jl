@@ -18,19 +18,11 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2, FileIO
 idPredio = 1 # 8 predio = 1,2,3,4,5,6,7,9
 conjuntoTemplates = [2] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
-dirTerrenos = string(pwd(), "\\", "src", "\\")
-
 
 conn_LotMassing = pg_julia.connection("LotMassing", "postgres", "postgres")
 conn_mygis_db = pg_julia.connection("mygis_db", "postgres", "postgres")
 
 
-df_normativa = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_normativa_default";""")
-dcn = datosCabidaNormativa()
-for field_s in fieldnames(datosCabidaNormativa)
-    value_ = df_normativa[:, field_s][1]
-    setproperty!(dcn, field_s, value_)
-end
 
 
 queryStr = """
@@ -42,20 +34,21 @@ antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif
 FROM datos_predios_vitacura
 WHERE codigo_predial = 151600243500009
 """
+"""
 df = pg_julia.query(conn_mygis_db, queryStr)
 
-
+dcn = datosCabidaNormativa()
 dcn.DISTANCIAMIENTO = df.distanciamiento[1]
 dcn.ANTEJARDIN = df.antejardin[1]
 dcn.RASANTE = tan(df.rasante[1]/180*pi)
 dcn.RASANTESOMBRA = 5
-dcn.ALTURAMAX = df.altura_max_total[1]
-dcn.MAXPISOS = df.num_pisos_total[1]
+dcn.ALTURAMAX = df.altura_max_total[1] #60 # 
+dcn.MAXPISOS = df.num_pisos_total[1] #30 # 
 dcn.COEFOCUPACION = df.ocupacion_suelo[1]
 dcn.SUBPREDIALMIN = df.subdivision_predial_minima[1]
-dcn.DENSIDADMAX = df.densidad_bruta_hab_ha[1]
+dcn.DENSIDADMAX = df.densidad_bruta_hab_ha[1] #10000 # 
 dcn.FLAGDENSIDADBRUTA = true
-dcn.COEFCONSTRUCTIBILIDAD = df.coef_constructibilidad[1]
+dcn.COEFCONSTRUCTIBILIDAD = df.coef_constructibilidad[1] #10000# 
 dcn.ESTACIONAMIENTOSPORVIV = 1
 dcn.PORCADICESTACVISITAS = .15
 dcn.SUPPORESTACIONAMIENTO = 30
@@ -66,19 +59,7 @@ dcn.MAXSUBTE = 7
 dcn.COEFOCUPACIONEST = .8
 dcn.SEPESTMIN = 7
 dcn.REDUCCIONESTPORDISTMETRO = false
-
-sup_terreno_edif = df.sup_terreno_edif[1]
-predios_str = df.predios_str[1]
-pos_menos = findall( x -> x .== '-', predios_str)
-num_vertices = Int(length(pos_menos)/2 - 1)
-x = zeros(num_vertices,1)
-y = zeros(num_vertices,1)
-for i = 1:num_vertices
-    x[i] = parse(Float64, predios_str[pos_menos[2*i-1]:pos_menos[2*i]-2])
-    y[i] = parse(Float64, predios_str[pos_menos[2*i]:pos_menos[2*i+1]-2])
-end
-
-
+"""
 
 dcc = datosCabidaComercial([50, 90, 110, 140], [1.0, 1.0, 1.0, 1.0], [95, 92, 90, 89], 200)
 dcr = datosCabidaRentabilidad(1.2)
@@ -105,6 +86,17 @@ for field_s in fieldnames(FlagPlotEdif3D)
     setproperty!(fpe, field_s, value_)
 end
 
+"""
+sup_terreno_edif = df.sup_terreno_edif[1]
+predios_str = df.predios_str[1]
+pos_menos = findall( x -> x .== '-', predios_str)
+num_vertices = Int(length(pos_menos)/2 - 1)
+x = zeros(num_vertices,1)
+y = zeros(num_vertices,1)
+for i = 1:num_vertices
+    x[i] = parse(Float64, predios_str[pos_menos[2*i-1]:pos_menos[2*i]-2])
+    y[i] = parse(Float64, predios_str[pos_menos[2*i]:pos_menos[2*i+1]-2])
+end
 
 areaSup = df.sup_terreno_edif[1]
 V = [x y]
@@ -118,9 +110,27 @@ x = x .- minimum(x)
 y = y .- minimum(y)
 V = [x y]
 dcp = datosCabidaPredio(x, y, [1], [15], 0, 200);
+"""
 
 
-        
+df_normativa = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_normativa_default";""")
+
+dcn = datosCabidaNormativa()
+for field_s in fieldnames(datosCabidaNormativa)
+    value_ = df_normativa[:, field_s][1]
+    setproperty!(dcn, field_s, value_)
+end
+
+dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
+dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
+factorCorreccion = 2;
+x = factorCorreccion * [0 30 40 45 10]';
+y = factorCorreccion * [10 0 15 35 30]';
+# Calle: [4]
+dcp = datosCabidaPredio(x, y, [1 4], [20 20], 1, 200); 
+
+
+
 resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
 ps_volteor, matConexionVertices, vecVertices,
 ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra,
