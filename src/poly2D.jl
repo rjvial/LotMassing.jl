@@ -1,6 +1,6 @@
 module poly2D
     
-using QHull, Statistics, LinearAlgebra, Clipper, Devices, PyPlot, LazySets
+using Statistics, Devices, PyPlot, LazySets
 
 """
 """
@@ -685,22 +685,6 @@ function convHull(V)
     return V_out
 end
 
-function simplicesConvHull(V_)
-    V = copy(V_);
-    k_ = QHull.chull(V);
-    k = k_.simplices;
-end
-
-
-
-function verticesConvHull(V_)
-    V = copy(V_);
-    k_ = QHull.chull(V);
-    k = k_.vertices;
-    n = length(k);
-    kk = vcat(k,k);
-    K = [kk[n:2*n-1] kk[1:n]];
-end
 
 
 function vert2con(V_)

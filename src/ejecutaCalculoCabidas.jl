@@ -88,7 +88,8 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
 
     
     
-    @time begin
+    #@time begin
+    begin
         cont = 0
 
         t = conjuntoTemplates[1] # for t in conjuntoTemplates
@@ -96,7 +97,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         cont += 1
 
         display("Inicio de Cálculo")
-        min_alt = min(maximum(vecAlturas_restSombra), dcn.RASANTE * dcn.DISTANCIAMIENTO); max_alt = maximum(vecAlturas_restSombra)
+        min_alt = min(maximum(vecAlturas_restSombra), dcn.RASANTE * dcn.DISTANCIAMIENTO); max_alt = min(dcn.MAXPISOS*dca.ALTURAPISO + 1,maximum(vecAlturas_restSombra))
         min_theta = pi/2; max_theta =  pi;
 
         min_largo = sepNaves; max_largo = 100; 
@@ -166,6 +167,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 1
         @showprogress 1 "Exploración de Soluciones...." for k = 1:a1-1
+        #for k = 1:a1-1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
             x_k, f_k = evol(fitness_restSombra, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)

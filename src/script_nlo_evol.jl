@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, CSV, JLD2, FileIO
+using LotMassing, .poly2D, .polyShape, CSV, FileIO
 
 # Random.seed!(1236)
 # Random.seed!(1230)
@@ -23,8 +23,6 @@ conn_LotMassing = pg_julia.connection("LotMassing", "postgres", "postgres")
 conn_mygis_db = pg_julia.connection("mygis_db", "postgres", "postgres")
 
 
-
-
 queryStr = """
 SELECT codigo_predial, sup_terreno_edif, zona, densidad_bruta_hab_ha, densidad_neta_viv_ha, subdivision_predial_minima,
 coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
@@ -34,34 +32,13 @@ antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif
 FROM datos_predios_vitacura
 WHERE codigo_predial = 151600243500009
 """
-"""
 df = pg_julia.query(conn_mygis_db, queryStr)
 
-dcn = datosCabidaNormativa()
-dcn.DISTANCIAMIENTO = df.distanciamiento[1]
-dcn.ANTEJARDIN = df.antejardin[1]
-dcn.RASANTE = tan(df.rasante[1]/180*pi)
-dcn.RASANTESOMBRA = 5
-dcn.ALTURAMAX = df.altura_max_total[1] #60 # 
-dcn.MAXPISOS = df.num_pisos_total[1] #30 # 
-dcn.COEFOCUPACION = df.ocupacion_suelo[1]
-dcn.SUBPREDIALMIN = df.subdivision_predial_minima[1]
-dcn.DENSIDADMAX = df.densidad_bruta_hab_ha[1] #10000 # 
-dcn.FLAGDENSIDADBRUTA = true
-dcn.COEFCONSTRUCTIBILIDAD = df.coef_constructibilidad[1] #10000# 
-dcn.ESTACIONAMIENTOSPORVIV = 1
-dcn.PORCADICESTACVISITAS = .15
-dcn.SUPPORESTACIONAMIENTO = 30
-dcn.ESTBICICLETAPOREST = .5
-dcn.BICICLETASPOREST = 3
-dcn.FLAGCAMBIOESTPORBICICLETA = true
-dcn.MAXSUBTE = 7
-dcn.COEFOCUPACIONEST = .8
-dcn.SEPESTMIN = 7
-dcn.REDUCCIONESTPORDISTMETRO = false
-"""
-
-dcc = datosCabidaComercial([50, 90, 110, 140], [1.0, 1.0, 1.0, 1.0], [95, 92, 90, 89], 200)
+dcc = datosCabidaComercial()
+dcc.SUPDEPTOUTIL = [50, 90, 110, 140]
+dcc.MAXPORCTIPODEPTO = [1.0, 1.0, 1.0, 1.0]
+dcc.PRECIOVENTA = [95, 92, 90, 89]
+dcc.PRECIOVENTAEST = 200
 dcr = datosCabidaRentabilidad(1.2)
 dcf = datosCabidaFlujo([0.05, 0.05, 0.05, 0.05, 0.1, 0.7], [1, 0, 0, 0, 0, 0], [0.05, 0.1, 0.35, 0.35, 0.15, 0.0], [0.4, 0.15, 0.15, 0.15, 0.15, 0.0], [0.0, 0.1, 0.2, 0.2, 0.25, 0.25], [0.1, 0.4, 0.25, 0.15, 0.05, 0.05], [0.0, 0.0, 0.0, 0.0, 0.5, 0.5], [0.0, 0.0, 0.0, 0.0, 0.25, 0.75], [0.05, 0.05, 0.05, 0.05, 0.05, 0.75], [0.0, 0.2, 0.2, 0.2, 0.2, 0.2], [0.05, 0.1, 0.35, 0.35, 0.15, 0.0], [0.0, 0.0, 0.1, 0.35, 0.35, 0.2], 0.27, 0.05, 24.0, 15)
 
@@ -86,7 +63,31 @@ for field_s in fieldnames(FlagPlotEdif3D)
     setproperty!(fpe, field_s, value_)
 end
 
-"""
+
+
+dcn = datosCabidaNormativa()
+dcn.DISTANCIAMIENTO = df.distanciamiento[1]
+dcn.ANTEJARDIN = df.antejardin[1]
+dcn.RASANTE = tan(df.rasante[1]/180*pi)
+dcn.RASANTESOMBRA = 5
+dcn.ALTURAMAX = df.altura_max_total[1]  
+dcn.MAXPISOS = df.num_pisos_total[1] 
+dcn.COEFOCUPACION = df.ocupacion_suelo[1]
+dcn.SUBPREDIALMIN = df.subdivision_predial_minima[1]
+dcn.DENSIDADMAX = df.densidad_bruta_hab_ha[1] 
+dcn.FLAGDENSIDADBRUTA = true
+dcn.COEFCONSTRUCTIBILIDAD = df.coef_constructibilidad[1] 
+dcn.ESTACIONAMIENTOSPORVIV = 1
+dcn.PORCADICESTACVISITAS = .15
+dcn.SUPPORESTACIONAMIENTO = 30
+dcn.ESTBICICLETAPOREST = .5
+dcn.BICICLETASPOREST = 3
+dcn.FLAGCAMBIOESTPORBICICLETA = true
+dcn.MAXSUBTE = 7
+dcn.COEFOCUPACIONEST = .8
+dcn.SEPESTMIN = 7
+dcn.REDUCCIONESTPORDISTMETRO = false
+
 sup_terreno_edif = df.sup_terreno_edif[1]
 predios_str = df.predios_str[1]
 pos_menos = findall( x -> x .== '-', predios_str)
@@ -100,7 +101,10 @@ end
 
 areaSup = df.sup_terreno_edif[1]
 V = [x y]
-V = polyShape.reversePath(V)
+is_ccw = polyShape.polyOrientation(PolyShape([V],1))
+if is_ccw == -1
+    V = polyShape.reversePath(V)
+end
 x = V[:,1]
 y = V[:,2]
 factorCorreccion = factorIgualaArea(V, areaSup) * 3
@@ -110,24 +114,6 @@ x = x .- minimum(x)
 y = y .- minimum(y)
 V = [x y]
 dcp = datosCabidaPredio(x, y, [1], [15], 0, 200);
-"""
-
-
-df_normativa = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_normativa_default";""")
-
-dcn = datosCabidaNormativa()
-for field_s in fieldnames(datosCabidaNormativa)
-    value_ = df_normativa[:, field_s][1]
-    setproperty!(dcn, field_s, value_)
-end
-
-dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
-dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-factorCorreccion = 2;
-x = factorCorreccion * [0 30 40 45 10]';
-y = factorCorreccion * [10 0 15 35 30]';
-# Calle: [4]
-dcp = datosCabidaPredio(x, y, [1 4], [20 20], 1, 200); 
 
 
 

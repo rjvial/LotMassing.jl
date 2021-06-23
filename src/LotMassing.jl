@@ -1,6 +1,6 @@
 module LotMassing
 
-using NPFinancial, JuMP, Polyhedra, BlackBoxOptim, Random, ProgressMeter, Cbc
+using NPFinancial, JuMP, BlackBoxOptim, Random, ProgressMeter, Cbc
 
 
 mutable struct RotInfo
@@ -89,6 +89,7 @@ mutable struct datosCabidaComercial
     MAXPORCTIPODEPTO
     PRECIOVENTA
     PRECIOVENTAEST
+    datosCabidaComercial() = new()
 end
 
 mutable struct datosCabidaUnit
