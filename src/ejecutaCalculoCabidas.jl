@@ -49,7 +49,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     vecAlturas_restSombra = sort(unique(V_volRestSombra[:,end]))
     altCorteVecinos = dcn.RASANTE * dcn.DISTANCIAMIENTO
     numVertices = size(V_areaEdif, 1);
-    sepNaves = dca.ANCHOMAX
+    sepNaves = (dca.ANCHOMIN + dca.ANCHOMAX)/2
 
     maxSupConstruida = superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) * (1 + dca.PORCSUPCOMUN)
 
@@ -78,8 +78,6 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         numPisos = Int(floor(alt / dca.ALTURAPISO)) 
         penalizacionConstructibilidad = max(0, areaBasal*numPisos - maxSupConstruida)
         penalizacionDensidad = max(0, areaBasal*numPisos - maxSupConstruidaDensidad)
-
-
         total_fit = numPisos * areaBasal - 
                     100 * numPisos * (penalizacionCoefOcup + penalizacion_r) -
                     1000*(penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
@@ -90,7 +88,8 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
 
     
     
-    @time begin
+    #@time begin
+    begin
         cont = 0
 
         t = conjuntoTemplates[1] # for t in conjuntoTemplates
@@ -98,14 +97,17 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         cont += 1
 
         display("Inicio de Cálculo")
-        min_alt = min(maximum(vecAlturas_restSombra), dcn.RASANTE * dcn.DISTANCIAMIENTO); max_alt = maximum(vecAlturas_restSombra)
+        min_alt = dca.ALTURAPISO*3; max_alt = min(dcn.MAXPISOS*dca.ALTURAPISO + 1,maximum(vecAlturas_restSombra))
         min_theta = pi/2; max_theta =  pi;
 
-        min_largo = sepNaves; max_largo = 100; 
-        min_largo1 = sepNaves; max_largo1 = 100;
-        min_largo2 = sepNaves; max_largo2 = 100;
-        min_largo1_ = sepNaves; max_largo1_ = 100;
-        min_largo2_ = sepNaves; max_largo2_ = 100;
+        largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
+        maxDiagonal = maximum(largosDiag)
+
+        min_largo = sepNaves; max_largo = maxDiagonal; 
+        min_largo1 = sepNaves; max_largo1 = maxDiagonal;
+        min_largo2 = sepNaves; max_largo2 = maxDiagonal;
+        min_largo1_ = sepNaves; max_largo1_ = maxDiagonal;
+        min_largo2_ = sepNaves; max_largo2_ = maxDiagonal;
 
         xmin = minimum(V_areaEdif[:,1]);  xmax = maximum(V_areaEdif[:,1]);
         ymin = minimum(V_areaEdif[:,2]);  ymax = maximum(V_areaEdif[:,2]);
@@ -120,8 +122,6 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
             ub = [max_alt, max_theta, xmax, ymax, max_alfa, max_largo1, max_largo2, max_ancho];
 
         elseif t == 2
-            largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
-            maxDiagonal = maximum(largosDiag)
 
             min_phi1 = 0; max_phi1 =  pi / 2;
             min_phi2 = 0; max_phi2 =  pi / 2;
@@ -163,11 +163,12 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_restSombra = 10000
         xopt_restSombra = []
-        MaxSteps_1 = 15000#18000
-        a1 = 12#6
+        MaxSteps_1 = 18000#15000
+        a1 = 5
         linSpace1 = collect(range(-pi, pi, length = a1))
         kopt1 = 1
         @showprogress 1 "Exploración de Soluciones...." for k = 1:a1-1
+        #for k = 1:a1-1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
             x_k, f_k = evol(fitness_restSombra, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)
@@ -180,7 +181,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         lb2_opt = linSpace1[kopt1]
         ub2_opt = linSpace1[kopt1+1]
 
-        a2 = 3#6
+        a2 = 7
         MaxSteps_2 = 20000
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1

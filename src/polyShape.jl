@@ -798,6 +798,19 @@ function reversePath(V)
 end
 
 
+function polyOrientation(ps)
+
+    V = ps.Vertices[1]
+    numVertices = size(V, 1)
+
+    poly = Devices.Polygon([Devices.Point(V[i,1], V[i,2]) for i = 1:numVertices])
+
+    is_ccw = Devices.Polygons.orientation(poly)
+
+    return is_ccw
+end
+
+
 function polyUnion(ps_s, ps_c)
 
     # if length(ps_s.Vertices) >= 1
@@ -1122,7 +1135,7 @@ end
 
 
 export extraeInfoPoly, isPolyConvex, isPolyInPoly, plotPolyshape, plotPolyshape3d_v1, plotPolyshape3d_v2, plotPolyshape3d_v3,
-        polyArea_v2, polyDifference, polyDifference_v2, polyDifference_v3, polyShape2constraints, polyUnion, polyUnion_v2, 
+        polyArea_v2, polyDifference, polyDifference_v2, polyDifference_v3, polyShape2constraints, polyOrientation, polyUnion, polyUnion_v2, 
         polyIntersect, polyIntersect_v2, polyIntersect_v3, polyExpand, polyExpandSides, plotPolyshape3d_v4, plotPolyshape3d_v5,
         polyExpandSides_v2
 

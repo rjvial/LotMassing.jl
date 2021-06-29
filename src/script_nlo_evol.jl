@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, CSV, JLD2
+using LotMassing, .poly2D, .polyShape, CSV, FileIO
 
 # Random.seed!(1236)
 # Random.seed!(1230)
@@ -16,36 +16,36 @@ using LotMassing, .poly2D, .polyShape, CSV, JLD2
 ##############################################
 
 idPredio = 1 # 8 predio = 1,2,3,4,5,6,7,9
-conjuntoTemplates = [5] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
+conjuntoTemplates = [2] # 4 [1:L, 2:C, 3:lll, 4:V, 5:H]
 
-dirTerrenos = string(pwd(), "\\", "src", "\\")
 
-@load "defaults.jld2" dcc dcf dcr
+conn_LotMassing = pg_julia.connection("LotMassing", "postgres", "postgres")
+conn_mygis_db = pg_julia.connection("mygis_db", "postgres", "postgres")
 
-conn = pg_julia.connection("LotMassing", "postgres", "lm4321")
 
-df_normativa = pg_julia.query(conn, """SELECT * FROM public."tabla_normativa_default";""")
-dcn = datosCabidaNormativa()
-for field_s in fieldnames(datosCabidaNormativa)
-    value_ = df_normativa[:, field_s][1]
-    setproperty!(dcn, field_s, value_)
-end
+dcc = datosCabidaComercial()
+dcc.SUPDEPTOUTIL = [50, 90, 110, 140]
+dcc.MAXPORCTIPODEPTO = [1.0, 1.0, 1.0, 1.0]
+dcc.PRECIOVENTA = [95, 92, 90, 89]
+dcc.PRECIOVENTAEST = 200
+dcr = datosCabidaRentabilidad(1.2)
+dcf = datosCabidaFlujo([0.05, 0.05, 0.05, 0.05, 0.1, 0.7], [1, 0, 0, 0, 0, 0], [0.05, 0.1, 0.35, 0.35, 0.15, 0.0], [0.4, 0.15, 0.15, 0.15, 0.15, 0.0], [0.0, 0.1, 0.2, 0.2, 0.25, 0.25], [0.1, 0.4, 0.25, 0.15, 0.05, 0.05], [0.0, 0.0, 0.0, 0.0, 0.5, 0.5], [0.0, 0.0, 0.0, 0.0, 0.25, 0.75], [0.05, 0.05, 0.05, 0.05, 0.05, 0.75], [0.0, 0.2, 0.2, 0.2, 0.2, 0.2], [0.05, 0.1, 0.35, 0.35, 0.15, 0.0], [0.0, 0.0, 0.1, 0.35, 0.35, 0.2], 0.27, 0.05, 24.0, 15)
 
-df_arquitectura = pg_julia.query(conn, """SELECT * FROM public."tabla_arquitectura_default";""")
+df_arquitectura = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_arquitectura_default";""")
 dca = datosCabidaArquitectura()
 for field_s in fieldnames(datosCabidaArquitectura)
     value_ = df_arquitectura[:, field_s][1]
     setproperty!(dca, field_s, value_)
 end
 
-df_costosunitarios = pg_julia.query(conn, """SELECT * FROM public."tabla_costosunitarios_default";""")
+df_costosunitarios = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_costosunitarios_default";""")
 dcu = datosCabidaUnit()
 for field_s in fieldnames(datosCabidaUnit)
     value_ = df_costosunitarios[:, field_s][1]
     setproperty!(dcu, field_s, value_)
 end
 
-df_flagplot = pg_julia.query(conn, """SELECT * FROM public."tabla_flagplot_default";""")
+df_flagplot = pg_julia.query(conn_LotMassing, """SELECT * FROM public."tabla_flagplot_default";""")
 fpe = FlagPlotEdif3D()
 for field_s in fieldnames(FlagPlotEdif3D)
     value_ = df_flagplot[:, field_s][1]
@@ -53,142 +53,94 @@ for field_s in fieldnames(FlagPlotEdif3D)
 end
 
 
-if idPredio == 1
-    dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
-    dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-    factorCorreccion = 2;
-    x = factorCorreccion * [0 30 40 45 10]';
-    y = factorCorreccion * [10 0 15 35 30]';
-# Calle: [4]
-    dcp = datosCabidaPredio(x, y, [1 4], [20 20], 1, 200);
 
-elseif idPredio == 2
-    factorCorreccion = 5;
-    x = factorCorreccion * [0 10 15 20 25 13 12 4 9]';
-    y = factorCorreccion * [10 0 12 7 20 25 22 28 14]';
-# Calle: [1 5]
-    dcp = datosCabidaPredio(x, y, [1 5], [20 20], 1, 200);
+# Sql calles contenidas en buffer del predio 
+queryStr = """ 
+WITH buffer_predio AS (select ST_Buffer(geom_predios, .0001) as geom
+			from datos_predios_vitacura
+			where codigo_predial = 151600094590126 
+			),
+	 calles AS (select ST_Transform(mc.geom, 4326) as geom
+		    from maestro_de_calles as mc 
+		    where mc.comuna = 'VITACURA')
+select ST_AsText(st_intersection(buffer_predio.geom, calles.geom)) as calles_str
+from calles join buffer_predio on st_intersects(buffer_predio.geom, calles.geom)
+"""
+df_ = pg_julia.query(conn_mygis_db, queryStr)
 
-elseif idPredio == 3
-# EJEMPLO 1 (Córdova y Figueroa con Vargas Fontecilla, Quinta Normal)
-    factorCorreccion = 0.8345;
-    x = factorCorreccion * [-7869557.5 -7869559.7 -7869535.4 -7869535.5 -7869490.4 -7869488.3]';
-    y = factorCorreccion * [-3952906.8 -3952965.7 -3952966.5 -3952970.9 -3952972.4 -3952909.6]';
-# Calle: [1 6]
-    dcp = datosCabidaPredio(x, y, [1 6], [18 20], 0, 200);
+# Sql segmentos del predio 
+queryStr = """
+select ST_AsText((ST_Dump(geom_segmentos)).geom) as segmentos_str
+from datos_predios_vitacura
+where codigo_predial = 151600094590126
+"""
+df__ = pg_julia.query(conn_mygis_db, queryStr)
 
-elseif idPredio == 4
-# EJEMPLO 2 (Catedral llegando a General Velásquez, Quinta Normal)
-    factorCorreccion = 0.8547;
-    x = factorCorreccion * [-7869442.1 -7869413.9 -7869409.5 -7869438.5]';
-    y = factorCorreccion * [-3953939.3 -3953935.5 -3953861.6 -3953864.5]';
-# Calle: [1]
-    dcp = datosCabidaPredio(x, y, [1], [20], 1, 200);
+# Sql parametros del predio 
+queryStr = """
+SELECT codigo_predial, sup_terreno_edif, zona, densidad_bruta_hab_ha, densidad_neta_viv_ha, subdivision_predial_minima,
+coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
+ocupacion_pisos_superiores_continua, coef_area_libre, rasante, num_pisos_continua, altura_max_continua, num_pisos_sobre_edif_continua,
+altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_sobre_edif_continua, distanciamiento_sobre_edif_continua,
+antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios) as predios_str
+FROM datos_predios_vitacura
+WHERE codigo_predial = 151600094590126
+"""
+#  151600243500009
+df = pg_julia.query(conn_mygis_db, queryStr)
 
-elseif idPredio == 5
-    factorCorreccion = 1;
-    x = factorCorreccion * [0 150 150 100 100 50 50 0]';
-    y = factorCorreccion * [0 0 100 100 50 50 100 100]';
-# Calle: [4]
-    dcp = datosCabidaPredio(x, y, [1 8], [15 15], 1, 200);
+dcn = datosCabidaNormativa()
+dcn.DISTANCIAMIENTO = df.distanciamiento[1]
+dcn.ANTEJARDIN = df.antejardin[1]
+dcn.RASANTE = tan(df.rasante[1]/180*pi)
+dcn.RASANTESOMBRA = 5
+dcn.ALTURAMAX = df.altura_max_total[1]  
+dcn.MAXPISOS = df.num_pisos_total[1] 
+dcn.COEFOCUPACION = df.ocupacion_suelo[1]
+dcn.SUBPREDIALMIN = df.subdivision_predial_minima[1]
+dcn.DENSIDADMAX = df.densidad_bruta_hab_ha[1] 
+dcn.FLAGDENSIDADBRUTA = true
+dcn.COEFCONSTRUCTIBILIDAD = df.coef_constructibilidad[1] 
+dcn.ESTACIONAMIENTOSPORVIV = 1
+dcn.PORCADICESTACVISITAS = .15
+dcn.SUPPORESTACIONAMIENTO = 30
+dcn.ESTBICICLETAPOREST = .5
+dcn.BICICLETASPOREST = 3
+dcn.FLAGCAMBIOESTPORBICICLETA = true
+dcn.MAXSUBTE = 7
+dcn.COEFOCUPACIONEST = .8
+dcn.SEPESTMIN = 7
+dcn.REDUCCIONESTPORDISTMETRO = false
 
-elseif idPredio == 6
-    # EJEMPLO 6 (Augusto Leguía)
-    factorCorreccion = 0.4;
-    x = factorCorreccion * [568 571 612 613 646 648 683 681]';
-    y = factorCorreccion * [-339 -405 -403 -418 -419 -452 -442 -355]';
-    # Calle: [1 6]
-    dcp = datosCabidaPredio(x, y, [1 6 8], [15 10 20], 0, 200);
-
-elseif idPredio == 7
-    # EJEMPLO 7 (Independencia)
-
-    dcn.DISTANCIAMIENTO = 4 # DISTANCIAMIENTO (m): max(4, separación mínima deslindes) OGUC 2.6.3
-    dcn.ANTEJARDIN = 0 # ANTEJARDIN (m) 
-    dcn.RASANTE = 1.732 # RASANTE (= tan(60*pi/180))
-    dcn.RASANTESOMBRA = 4 # RASANTESOMBRA
-    dcn.ALTURAMAX = 90 # 24, #ALTURAMAX (m)
-    dcn.MAXPISOS = 30 # 9, #MAXPISOS (unidades)
-    dcn.COEFOCUPACION = .6 # COEFOCUPACION (m2 / m2 de terreno)
-    dcn.SUBPREDIALMIN = 250 # SUBPREDIALMIN (m2)
-    dcn.DENSIDADMAX = 4000 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
-    dcn.COEFCONSTRUCTIBILIDAD = 5 # COEFCONSTRUCTIBILIDAD (m2 / m2 de terreno)
-    dca.ANCHOMAX = 16 # ANCHOMAX (m)
-    # dcc.SUPDEPTOUTIL = [20, 35, 50, 60] # SUPDEPTOUTIL (m2)
-    # dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-    dcc.SUPDEPTOUTIL = [30, 40, 50, 65] # SUPDEPTOUTIL (m2)
-    dcc.PRECIOVENTA = [65, 58, 53, 50] # PRECIOVENTA (UF / m2 vendible) 
-    dcc.MAXPORCTIPODEPTO = [1, 1, 1, 1] # MAXPORCTIPODEPTO  
-    dcr = datosCabidaRentabilidad(1.15) # RetornoExigido
-
-    nombreArchivo = "cerrillos.csv"
-    loadData = CSV.File(string(dirTerrenos, nombreArchivo); header=false)
-    numDatos = length(loadData)
-    x = zeros(1, numDatos)
-    y = zeros(1, numDatos)
-    for i = 1:numDatos
-        x[i] = loadData[i].Column1
-        y[i] = loadData[i].Column2
-    end
-    areaSup = x[1]
-    x = x[2:end]
-    y = y[2:end]
-    V = [x y]
-    factorCorreccion = factorIgualaArea(V, areaSup)
-    dcp = datosCabidaPredio(factorCorreccion * x, factorCorreccion * y, [1], [12], 1, 200);
-
-elseif idPredio == 8
-
-
-elseif idPredio == 9
-    # EJEMPLO 9 (El Dante)
-
-    dcn.DISTANCIAMIENTO = 8 # DISTANCIAMIENTO (m): max(4, separación mínima deslindes) OGUC 2.6.3
-    dcn.ANTEJARDIN = 7 # ANTEJARDIN (m) 
-    dcn.ALTURAMAX = 52.5 # 47 # 24, #ALTURAMAX (m)
-    dcn.MAXPISOS = 15 # 9, #MAXPISOS (unidades)
-    dcn.COEFOCUPACION = .3 # COEFOCUPACION (m2 de base / m2 de terreno)
-    dcn.SUBPREDIALMIN = 1500 # SUBPREDIALMIN (m2)
-    dcn.DENSIDADMAX = 880 # DENSIDADMAX (Habitantes / 10000 m2 de terreno bruto)
-    dcn.FLAGDENSIDADBRUTA = false # FLAGDENSIDADBRUTA
-    dcn.COEFCONSTRUCTIBILIDAD = 2.8 # COEFCONSTRUCTIBILIDAD (m2 de Sup. Util/ m2 de terreno)
-    dcn.ESTACIONAMIENTOSPORVIV = [1.5, 1.5, 1.5, 2] # ESTACIONAMIENTOSPORVIV
-    dcn.FLAGCAMBIOESTPORBICICLETA = true # FLAGCAMBIOESTPORBICICLETA
-    dcc.SUPDEPTOUTIL = [50, 90, 110, 140] # SUPDEPTOUTIL (m2)
-    dcc.PRECIOVENTA = [95, 91, 89, 87] # PRECIOVENTA (UF / m2 vendible) 
-    dcc.MAXPORCTIPODEPTO = [1, 1, 1, 1];
-    dcc.PRECIOVENTAEST = 350 # PRECIOVENTAEST (UF / unidad)
-
-    dcu.LosaSNT = 30 # LosaSNT 
-    dcu.LosaBNT = 12 # LosaBNT 
-
-    dca.ANCHOMAX = 16 # Ancho Crujía (m)
-    dca.ALTURAPISO = 2.7 # 2.625, # ALTURAPISO (m / piso)
-    dca.PORCSUPCOMUN = .2 # PORCSUPCOMUN (m2 / m2 útil)
-
-    nombreArchivo = "el_dante_2.csv"
-    # nombreArchivo = "predio_ElDante.csv"
-    loadData = CSV.File(string(dirTerrenos, nombreArchivo); header=false)
-    numDatos = length(loadData)
-    x = zeros(1, numDatos)
-    y = zeros(1, numDatos)
-    for i = 1:numDatos
-        x[i] = loadData[i].Column1
-        y[i] = loadData[i].Column2
-    end
-    areaSup = x[1]
-    x = x[2:end]
-    y = y[2:end]
-    V = [x y]
-    factorCorreccion = factorIgualaArea(V, areaSup)
-    x = factorCorreccion * x
-    y = factorCorreccion * y
-    dcp = datosCabidaPredio(x, y, [1,2,3], [15,15,15], 0, 200);
-#    dcp = datosCabidaPredio(x, y, [1,2,3,4,5,6], [15,15,15,15,15,20], 0, 200);
-
+sup_terreno_edif = df.sup_terreno_edif[1]
+predios_str = df.predios_str[1]
+pos_menos = findall( x -> x .== '-', predios_str)
+num_vertices = Int(length(pos_menos)/2 - 1)
+x = zeros(num_vertices,1)
+y = zeros(num_vertices,1)
+for i = 1:num_vertices
+    x[i] = parse(Float64, predios_str[pos_menos[2*i-1]:pos_menos[2*i]-2])
+    y[i] = parse(Float64, predios_str[pos_menos[2*i]:pos_menos[2*i+1]-2])
 end
 
-        
+V = [x y]
+is_ccw = polyShape.polyOrientation(PolyShape([V],1))
+if is_ccw == -1 #counter clockwise?
+    V = polyShape.reversePath(V)
+end
+x = V[:,1]
+y = V[:,2]
+factorCorreccion = factorIgualaArea(V, sup_terreno_edif)
+x = factorCorreccion * x
+y = factorCorreccion * y
+x = x .- minimum(x)
+y = y .- minimum(y)
+V = [x y]
+dcp = datosCabidaPredio(x, y, [1], [15], 0, 200);
+
+
+
+
 resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
 ps_volteor, matConexionVertices, vecVertices,
 ps_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra,
