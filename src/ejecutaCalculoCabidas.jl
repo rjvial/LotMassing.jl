@@ -49,7 +49,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     vecAlturas_restSombra = sort(unique(V_volRestSombra[:,end]))
     altCorteVecinos = dcn.RASANTE * dcn.DISTANCIAMIENTO
     numVertices = size(V_areaEdif, 1);
-    sepNaves = dca.ANCHOMAX
+    sepNaves = (dca.ANCHOMIN + dca.ANCHOMAX)/2
 
     maxSupConstruida = superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) * (1 + dca.PORCSUPCOMUN)
 
@@ -97,14 +97,17 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         cont += 1
 
         display("Inicio de Cálculo")
-        min_alt = min(maximum(vecAlturas_restSombra), dcn.RASANTE * dcn.DISTANCIAMIENTO); max_alt = min(dcn.MAXPISOS*dca.ALTURAPISO + 1,maximum(vecAlturas_restSombra))
+        min_alt = dca.ALTURAPISO*3; max_alt = min(dcn.MAXPISOS*dca.ALTURAPISO + 1,maximum(vecAlturas_restSombra))
         min_theta = pi/2; max_theta =  pi;
 
-        min_largo = sepNaves; max_largo = 100; 
-        min_largo1 = sepNaves; max_largo1 = 100;
-        min_largo2 = sepNaves; max_largo2 = 100;
-        min_largo1_ = sepNaves; max_largo1_ = 100;
-        min_largo2_ = sepNaves; max_largo2_ = 100;
+        largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
+        maxDiagonal = maximum(largosDiag)
+
+        min_largo = sepNaves; max_largo = maxDiagonal; 
+        min_largo1 = sepNaves; max_largo1 = maxDiagonal;
+        min_largo2 = sepNaves; max_largo2 = maxDiagonal;
+        min_largo1_ = sepNaves; max_largo1_ = maxDiagonal;
+        min_largo2_ = sepNaves; max_largo2_ = maxDiagonal;
 
         xmin = minimum(V_areaEdif[:,1]);  xmax = maximum(V_areaEdif[:,1]);
         ymin = minimum(V_areaEdif[:,2]);  ymax = maximum(V_areaEdif[:,2]);
@@ -119,8 +122,6 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
             ub = [max_alt, max_theta, xmax, ymax, max_alfa, max_largo1, max_largo2, max_ancho];
 
         elseif t == 2
-            largos, angulosExt, angulosInt, largosDiag =  polyShape.extraeInfoPoly(ps_areaEdif)
-            maxDiagonal = maximum(largosDiag)
 
             min_phi1 = 0; max_phi1 =  pi / 2;
             min_phi2 = 0; max_phi2 =  pi / 2;

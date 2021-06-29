@@ -23,17 +23,6 @@ conn_LotMassing = pg_julia.connection("LotMassing", "postgres", "postgres")
 conn_mygis_db = pg_julia.connection("mygis_db", "postgres", "postgres")
 
 
-queryStr = """
-SELECT codigo_predial, sup_terreno_edif, zona, densidad_bruta_hab_ha, densidad_neta_viv_ha, subdivision_predial_minima,
-coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
-ocupacion_pisos_superiores_continua, coef_area_libre, rasante, num_pisos_continua, altura_max_continua, num_pisos_sobre_edif_continua,
-altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_sobre_edif_continua, distanciamiento_sobre_edif_continua,
-antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios) as predios_str
-FROM datos_predios_vitacura
-WHERE codigo_predial = 151600243500009
-"""
-df = pg_julia.query(conn_mygis_db, queryStr)
-
 dcc = datosCabidaComercial()
 dcc.SUPDEPTOUTIL = [50, 90, 110, 140]
 dcc.MAXPORCTIPODEPTO = [1.0, 1.0, 1.0, 1.0]
@@ -64,6 +53,41 @@ for field_s in fieldnames(FlagPlotEdif3D)
 end
 
 
+
+# Sql calles contenidas en buffer del predio 
+queryStr = """ 
+WITH buffer_predio AS (select ST_Buffer(geom_predios, .0001) as geom
+			from datos_predios_vitacura
+			where codigo_predial = 151600094590126 
+			),
+	 calles AS (select ST_Transform(mc.geom, 4326) as geom
+		    from maestro_de_calles as mc 
+		    where mc.comuna = 'VITACURA')
+select ST_AsText(st_intersection(buffer_predio.geom, calles.geom)) as calles_str
+from calles join buffer_predio on st_intersects(buffer_predio.geom, calles.geom)
+"""
+df_ = pg_julia.query(conn_mygis_db, queryStr)
+
+# Sql segmentos del predio 
+queryStr = """
+select ST_AsText((ST_Dump(geom_segmentos)).geom) as segmentos_str
+from datos_predios_vitacura
+where codigo_predial = 151600094590126
+"""
+df__ = pg_julia.query(conn_mygis_db, queryStr)
+
+# Sql parametros del predio 
+queryStr = """
+SELECT codigo_predial, sup_terreno_edif, zona, densidad_bruta_hab_ha, densidad_neta_viv_ha, subdivision_predial_minima,
+coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
+ocupacion_pisos_superiores_continua, coef_area_libre, rasante, num_pisos_continua, altura_max_continua, num_pisos_sobre_edif_continua,
+altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_sobre_edif_continua, distanciamiento_sobre_edif_continua,
+antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios) as predios_str
+FROM datos_predios_vitacura
+WHERE codigo_predial = 151600094590126
+"""
+#  151600243500009
+df = pg_julia.query(conn_mygis_db, queryStr)
 
 dcn = datosCabidaNormativa()
 dcn.DISTANCIAMIENTO = df.distanciamiento[1]
@@ -99,21 +123,21 @@ for i = 1:num_vertices
     y[i] = parse(Float64, predios_str[pos_menos[2*i]:pos_menos[2*i+1]-2])
 end
 
-areaSup = df.sup_terreno_edif[1]
 V = [x y]
 is_ccw = polyShape.polyOrientation(PolyShape([V],1))
-if is_ccw == -1
+if is_ccw == -1 #counter clockwise?
     V = polyShape.reversePath(V)
 end
 x = V[:,1]
 y = V[:,2]
-factorCorreccion = factorIgualaArea(V, areaSup) * 3
+factorCorreccion = factorIgualaArea(V, sup_terreno_edif)
 x = factorCorreccion * x
 y = factorCorreccion * y
 x = x .- minimum(x)
 y = y .- minimum(y)
 V = [x y]
 dcp = datosCabidaPredio(x, y, [1], [15], 0, 200);
+
 
 
 
