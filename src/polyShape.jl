@@ -1,6 +1,7 @@
 module polyShape
     
-using ..poly2D, LotMassing, PyPlot, Devices, Clipper, PyCall
+using ..poly2D, LotMassing, PyPlot, Devices, Clipper, PyCall, ArchGDAL
+const AG = ArchGDAL
 
 
 """
@@ -787,6 +788,7 @@ function polyShape2constraints(ps)
 end
 
 
+
 function reversePath(V)
     V_ = copy(V)
     numVertices = size(V_, 1)
@@ -802,115 +804,80 @@ function polyOrientation(ps)
 
     V = ps.Vertices[1]
     numVertices = size(V, 1)
-
     poly = Devices.Polygon([Devices.Point(V[i,1], V[i,2]) for i = 1:numVertices])
-
     is_ccw = Devices.Polygons.orientation(poly)
 
     return is_ccw
 end
 
 
-function polyUnion(ps_s, ps_c)
+function gdal2polyshape(poly)
 
-    # if length(ps_s.Vertices) >= 1
-    V_s = ps_s.Vertices[1]
-    numVertices_s = size(V_s, 1)
-
-    V_c = ps_c.Vertices[1]
-    numVertices_c = size(V_c, 1)
-
-    poly_s = Devices.Polygon([Devices.Point(V_s[i,1], V_s[i,2]) for i = 1:numVertices_s])
-    poly_c = Devices.Polygon([Devices.Point(V_c[i,1], V_c[i,2]) for i = 1:numVertices_c])
-    poly_ = Devices.Polygons.clip(Clipper.ClipTypeUnion, poly_s, poly_c)
-
-    numRegiones = length(poly_)
+    numRegiones = AG.ngeom(poly)
+    if numRegiones >= 2
+        poly_ = AG.getgeom(poly, 0)
+        for k = 0:numRegiones-2
+            poly_k1 = AG.getgeom(poly, k+1)
+            poly_ = AG.union(poly_, poly_k1)
+        end
+        poly = poly_
+    end
     ps_out = PolyShape([], numRegiones)
-    for k = 1:numRegiones
-        poly_k = poly_[k].p
-        numVertices_k = size(poly_k, 1)
+    numRegiones = AG.ngeom(poly)
+    for k = 0:numRegiones-1
+        if AG.geomname(poly) == "MULTIPOLYGON"
+            poly_k = AG.getgeom(poly, k)
+            lr_k = AG.getgeom(poly_k,0)
+        else
+            lr_k = AG.getgeom(poly, k)
+        end
+        numVertices_k = AG.ngeom(lr_k)-1
         V_k = zeros(numVertices_k, 2)
         for i = 1:numVertices_k
-            V_k[i,1] = poly_k[i][1]
-            V_k[i,2] = poly_k[i][2]
+            V_k[i,1] = AG.getx(lr_k,i-1)
+            V_k[i,2] = AG.gety(lr_k,i-1)
         end
         ps_out.Vertices = push!(ps_out.Vertices, V_k)
     end
     ps_out.NumRegions = length(ps_out.Vertices)
     return ps_out
-    # else
-    #    return ps_s
-    # end
+end
+
+
+function polyshape2gdal(ps)
+    n = ps.NumRegions
+    poly_out = AG.createmultipolygon()
+    for k = 1:n
+        V_k = ps.Vertices[k]
+        largo_k = size(V_k,1)
+        lr_k = AG.createlinearring()
+        for i in 1:largo_k
+            AG.addpoint!(lr_k, V_k[i,1], V_k[i,2])
+        end 
+        AG.addpoint!(lr_k, V_k[1,1], V_k[1,2])
+        poly_k = AG.createpolygon()
+        AG.addgeom!(poly_k, lr_k)
+        AG.addgeom!(poly_out, poly_k)
+    end
+    poly_out = AG.simplify(poly_out,0.1)
+    return poly_out    
+end
+
+
+function polyUnion(ps_s, ps_c)
+
+    poly_s = polyshape2gdal(ps_s)
+    poly_c = polyshape2gdal(ps_c)
+    poly_ = AG.union(poly_s, poly_c)
+    ps_out = gdal2polyshape(poly_)
+    return ps_out
 
 end
 
 
-function polyUnion_v2(ps_s_, ps_c_)
+function polyUnion_v2(ps_s, ps_c)
 
-    ps_s = PolyShape([], 0)
-    ps_s.Vertices = copy(ps_s_.Vertices)
-    ps_s.NumRegions = length(ps_s_.Vertices)
-
-    ps_c = PolyShape([], 0)
-    ps_c.Vertices = copy(ps_c_.Vertices)
-    ps_c.NumRegions = length(ps_c_.Vertices)
-
-    numRegiones_s = ps_s.NumRegions
-    numRegiones_c = ps_c.NumRegions
-
-    matUnion = zeros(numRegiones_s, numRegiones_c)
-    matPolyunions = Array{PolyShape,2}(undef, numRegiones_s, numRegiones_c)
-    vecReg_s_ = []
-    vecReg_c_ = []
-
-    if length(ps_s.Vertices) == 0
-        ps_r = ps_c
-    elseif length(ps_c.Vertices) == 0
-        ps_r = ps_s
-    else
-        for i = 1:numRegiones_s
-            ps_s_i = PolyShape([ps_s.Vertices[i]], 1)
-            for j = 1:numRegiones_c
-                ps_c_j = PolyShape([ps_c.Vertices[j]], 1)
-                ps_ij = polyUnion(ps_s_i, ps_c_j)
-                matUnion[i,j] = 1 * (ps_ij.NumRegions >= 1)
-                if matUnion[i,j] == 1
-                    vecReg_s_ = unique([vecReg_s_; i])
-                    vecReg_c_ = unique([vecReg_c_; j])
-                end
-                matPolyunions[i,j] = ps_ij
-            end        
-        end
-
-        vecReg_s = [i for i = 1:numRegiones_s]
-        vecReg_c = [j for j = 1:numRegiones_c]
-        vecRegSep_s = setdiff(vecReg_s, vecReg_s_)
-        vecRegSep_c = setdiff(vecReg_c, vecReg_c_)
-
-        ps_r = PolyShape([], 0)
-        for i = 1:numRegiones_s
-            for j = 1:numRegiones_c
-                if matUnion[i,j] == 1
-                    if ps_r.NumRegions == 0
-                        ps_r = matPolyunions[i,j]
-                    else
-                        ps_r = polyUnion(ps_r, matPolyunions[i,j])
-                    end
-                end
-            end
-        end
-
-        for i in vecRegSep_s
-            ps_s_i = PolyShape([ps_s.Vertices[i]], 1)
-            ps_r = polyUnion(ps_r, ps_s_i)
-        end
-
-        for j in vecRegSep_c
-            ps_c_j = PolyShape([ps_c.Vertices[j]], 1)
-            ps_r = polyUnion(ps_r, ps_c_j)
-        end
-    end
-    
+    ps_r = polyUnion(ps_s, ps_c)    
     return ps_r
 
 end
@@ -1137,6 +1104,6 @@ end
 export extraeInfoPoly, isPolyConvex, isPolyInPoly, plotPolyshape, plotPolyshape3d_v1, plotPolyshape3d_v2, plotPolyshape3d_v3,
         polyArea_v2, polyDifference, polyDifference_v2, polyDifference_v3, polyShape2constraints, polyOrientation, polyUnion, polyUnion_v2, 
         polyIntersect, polyIntersect_v2, polyIntersect_v3, polyExpand, polyExpandSides, plotPolyshape3d_v4, plotPolyshape3d_v5,
-        polyExpandSides_v2
+        polyExpandSides_v2, polyshape2gdal, gdal2polyshape
 
 end
