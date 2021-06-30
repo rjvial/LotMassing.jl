@@ -3,8 +3,7 @@ module polyShape
 using ..poly2D, LotMassing, PyPlot, Devices, Clipper, PyCall
 
 
-"""
-"""
+
 function extraeInfoPoly(ps)
 
 
@@ -813,7 +812,6 @@ end
 
 function polyUnion(ps_s, ps_c)
 
-    # if length(ps_s.Vertices) >= 1
     V_s = ps_s.Vertices[1]
     numVertices_s = size(V_s, 1)
 
@@ -838,9 +836,6 @@ function polyUnion(ps_s, ps_c)
     end
     ps_out.NumRegions = length(ps_out.Vertices)
     return ps_out
-    # else
-    #    return ps_s
-    # end
 
 end
 

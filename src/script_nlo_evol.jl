@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, CSV, FileIO
+using LotMassing, .poly2D, .polyShape, CSV
 
 # Random.seed!(1236)
 # Random.seed!(1230)
@@ -70,7 +70,7 @@ df_ = pg_julia.query(conn_mygis_db, queryStr)
 
 # Sql segmentos del predio 
 queryStr = """
-select ST_AsText((ST_Dump(geom_segmentos)).geom) as segmentos_str
+select ST_AsText( (ST_Dump(geom_segmentos)).geom ) as segmentos_str
 from datos_predios_vitacura
 where codigo_predial = 151600094590126
 """
@@ -82,7 +82,7 @@ SELECT codigo_predial, sup_terreno_edif, zona, densidad_bruta_hab_ha, densidad_n
 coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
 ocupacion_pisos_superiores_continua, coef_area_libre, rasante, num_pisos_continua, altura_max_continua, num_pisos_sobre_edif_continua,
 altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_sobre_edif_continua, distanciamiento_sobre_edif_continua,
-antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios) as predios_str
+antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText( geom_predios ) as predios_str
 FROM datos_predios_vitacura
 WHERE codigo_predial = 151600094590126
 """
