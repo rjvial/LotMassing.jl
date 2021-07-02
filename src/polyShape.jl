@@ -1,7 +1,7 @@
 module polyShape
     
-using ..poly2D, LotMassing, PyPlot, Devices, Clipper, PyCall, ArchGDAL
-const AG = ArchGDAL
+using ..poly2D, LotMassing, PyPlot, Devices, Clipper, PyCall
+
 
 
 """
@@ -811,31 +811,28 @@ function polyOrientation(ps)
 end
 
 
-function gdal2polyshape(poly)
+function clipper2polyshape(poly)
 
-    numRegiones = AG.ngeom(poly)
+    numRegiones = length(poly)
     if numRegiones >= 2
-        poly_ = AG.getgeom(poly, 0)
-        for k = 0:numRegiones-2
-            poly_k1 = AG.getgeom(poly, k+1)
-            poly_ = AG.union(poly_, poly_k1)
+        poly_ = poly[1]
+        for k = 2:numRegiones
+            poly_k = poly[2]
+            poly_ = Devices.Polygons.clip(Clipper.ClipTypeUnion, poly_, poly_k)
         end
-        poly = poly_
+        if ~isa(poly_, Array)
+            poly = [poly_]
+        end
     end
     ps_out = PolyShape([], numRegiones)
-    numRegiones = AG.ngeom(poly)
-    for k = 0:numRegiones-1
-        if AG.geomname(poly) == "MULTIPOLYGON"
-            poly_k = AG.getgeom(poly, k)
-            lr_k = AG.getgeom(poly_k,0)
-        else
-            lr_k = AG.getgeom(poly, k)
-        end
-        numVertices_k = AG.ngeom(lr_k)-1
+
+    for k = 1:numRegiones
+        poly_k = poly[k].p
+        numVertices_k = length(poly_k)
         V_k = zeros(numVertices_k, 2)
         for i = 1:numVertices_k
-            V_k[i,1] = AG.getx(lr_k,i-1)
-            V_k[i,2] = AG.gety(lr_k,i-1)
+            V_k[i,1] = poly_k[i][1]
+            V_k[i,2] = poly_k[i][2]
         end
         ps_out.Vertices = push!(ps_out.Vertices, V_k)
     end
@@ -844,45 +841,38 @@ function gdal2polyshape(poly)
 end
 
 
-function polyshape2gdal(ps)
+function polyshape2clipper(ps)
     n = ps.NumRegions
-    poly_out = AG.createmultipolygon()
+    poly_out  = Array{Devices.Polygon{Float64},1}()
     for k = 1:n
         V_k = ps.Vertices[k]
         largo_k = size(V_k,1)
-        lr_k = AG.createlinearring()
-        for i in 1:largo_k
-            AG.addpoint!(lr_k, V_k[i,1], V_k[i,2])
-        end 
-        AG.addpoint!(lr_k, V_k[1,1], V_k[1,2])
-        poly_k = AG.createpolygon()
-        AG.addgeom!(poly_k, lr_k)
-        AG.addgeom!(poly_out, poly_k)
+        poly_k = Devices.Polygon([Devices.Point(V_k[i,1], V_k[i,2]) for i = 1:largo_k])
+        push!(poly_out, poly_k)
     end
-    poly_out = AG.polygonize(poly_out)
     return poly_out    
 end
 
 
 function polyUnion(ps_s, ps_c)
-
-    poly_s = polyshape2gdal(ps_s)
-    poly_c = polyshape2gdal(ps_c)
-    poly_ = AG.union(poly_s, poly_c)
-    ps_out = gdal2polyshape(poly_)
+    poly_s = polyshape2clipper(ps_s)
+    poly_c = polyshape2clipper(ps_c)
+    poly_ = Devices.Polygons.clip(Clipper.ClipTypeUnion, poly_s, poly_c)
+    ps_out = clipper2polyshape(poly_)
     return ps_out
-
 end
 
 
-function polyUnion_v2(ps_s, ps_c)
-
-    ps_r = polyUnion(ps_s, ps_c)    
-    return ps_r
-
+function polyDifference(ps_s, ps_c)
+    poly_s = polyshape2clipper(ps_s)
+    poly_c = polyshape2clipper(ps_c)
+    poly_ = Devices.Polygons.clip(Clipper.ClipTypeDifference, poly_s, poly_c)
+    ps_out = clipper2polyshape(poly_)
+    return ps_out
 end
 
 
+"""
 function polyDifference(ps_s, ps_c)
     V_s = ps_s.Vertices[1]
     numVertices_s = size(V_s, 1)
@@ -955,7 +945,7 @@ function polyDifference_v3(ps_s, ps_c)
 
     return ps_s_
 end
-
+"""
 
 function polyIntersect(ps_s, ps_c)
 
@@ -1102,8 +1092,8 @@ end
 
 
 export extraeInfoPoly, isPolyConvex, isPolyInPoly, plotPolyshape, plotPolyshape3d_v1, plotPolyshape3d_v2, plotPolyshape3d_v3,
-        polyArea_v2, polyDifference, polyDifference_v2, polyDifference_v3, polyShape2constraints, polyOrientation, polyUnion, polyUnion_v2, 
+        polyArea_v2, polyDifference, polyShape2constraints, polyOrientation, polyUnion, 
         polyIntersect, polyIntersect_v2, polyIntersect_v3, polyExpand, polyExpandSides, plotPolyshape3d_v4, plotPolyshape3d_v5,
-        polyExpandSides_v2, polyshape2gdal, gdal2polyshape
+        polyExpandSides_v2, polyshape2clipper, clipper2polyshape
 
 end

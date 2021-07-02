@@ -27,35 +27,35 @@ function generaSombraEdificio(ps_baseEdificio, alt, ps_publico, ps_calles)
             ps_SombraEdif_o.Vertices = push!(ps_SombraEdif_o.Vertices, V_SombraEdif_o)
             ps_SombraEdif_s.Vertices = push!(ps_SombraEdif_s.Vertices, V_SombraEdif_s)
         else
-            ps_SombraEdif_p = polyShape.polyUnion_v2(ps_SombraEdif_p, PolyShape([V_SombraEdif_p],1))
-            ps_SombraEdif_o = polyShape.polyUnion_v2(ps_SombraEdif_o, PolyShape([V_SombraEdif_o],1))
-            ps_SombraEdif_s = polyShape.polyUnion_v2(ps_SombraEdif_s, PolyShape([V_SombraEdif_s],1))
+            ps_SombraEdif_p = polyShape.polyUnion(ps_SombraEdif_p, PolyShape([V_SombraEdif_p],1))
+            ps_SombraEdif_o = polyShape.polyUnion(ps_SombraEdif_o, PolyShape([V_SombraEdif_o],1))
+            ps_SombraEdif_s = polyShape.polyUnion(ps_SombraEdif_s, PolyShape([V_SombraEdif_s],1))
         end
     end
 
     
-    p_p = polyShape.polyDifference_v3(ps_SombraEdif_p, ps_publico)
+    p_p = polyShape.polyDifference(ps_SombraEdif_p, ps_publico)
     if length(p_p.Vertices) > 0
         ps_sombraEdif_p = PolyShape(p_p.Vertices, length(p_p.Vertices))
     else
         ps_sombraEdif_p = PolyShape([],0)
     end
-    p_o = polyShape.polyDifference_v3(ps_SombraEdif_o, ps_publico)
+    p_o = polyShape.polyDifference(ps_SombraEdif_o, ps_publico)
     if length(p_o.Vertices)>0
         ps_sombraEdif_o = PolyShape(p_o.Vertices, length(p_o.Vertices))
     else
         ps_sombraEdif_o = PolyShape([],0)
     end
-    p_s = polyShape.polyDifference_v3(ps_SombraEdif_s, ps_publico)
+    p_s = polyShape.polyDifference(ps_SombraEdif_s, ps_publico)
     if length(p_s.Vertices)>0
         ps_sombraEdif_s = PolyShape(p_s.Vertices, length(p_s.Vertices))
     else
         ps_sombraEdif_s = PolyShape([],0)
     end
 
-    ps_sombraEdif_p = polyShape.polyDifference_v3(ps_sombraEdif_p, ps_calles)
-    ps_sombraEdif_o = polyShape.polyDifference_v3(ps_sombraEdif_o, ps_calles)
-    ps_sombraEdif_s = polyShape.polyDifference_v3(ps_sombraEdif_s, ps_calles)
+    ps_sombraEdif_p = polyShape.polyDifference(ps_sombraEdif_p, ps_calles)
+    ps_sombraEdif_o = polyShape.polyDifference(ps_sombraEdif_o, ps_calles)
+    ps_sombraEdif_s = polyShape.polyDifference(ps_sombraEdif_s, ps_calles)
 
     return ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s
 end

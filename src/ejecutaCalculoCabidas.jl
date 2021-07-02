@@ -71,7 +71,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         penalizacionSombra_o = max(0, areaSombraEdif_o - areaSombra_o)
         penalizacionSombra_s = max(0, areaSombraEdif_s - areaSombra_s)
         
-        ps_r = polyShape.polyDifference_v3(ps_base, psCorte) #Sector de la base del edificio que sobrepasa el areaEdif
+        ps_r = polyShape.polyDifference(ps_base, psCorte) #Sector de la base del edificio que sobrepasa el areaEdif
         area_r = polyShape.polyArea_v2(ps_r) #Area del sector que sobrepasa
         penalizacion_r = area_r^1.1
         penalizacionCoefOcup = max(0, areaBasal - dcn.COEFOCUPACION * superficieTerreno)

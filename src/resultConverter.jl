@@ -84,8 +84,8 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
 
-        ps_base = polyShape.polyUnion_v2(ps0, ps1)
-        ps_base = polyShape.polyUnion_v2(ps_base, ps2)
+        ps_base = polyShape.polyUnion(ps0, ps1)
+        ps_base = polyShape.polyUnion(ps_base, ps2)
         ps_baseSeparada = PolyShape([V0, V1, V2], 3)
 
     elseif template == 3 #III
