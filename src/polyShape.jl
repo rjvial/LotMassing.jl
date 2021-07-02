@@ -859,7 +859,7 @@ function polyshape2gdal(ps)
         AG.addgeom!(poly_k, lr_k)
         AG.addgeom!(poly_out, poly_k)
     end
-    poly_out = AG.simplify(poly_out,0.1)
+    poly_out = AG.polygonize(poly_out)
     return poly_out    
 end
 
