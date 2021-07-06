@@ -6,7 +6,7 @@
 
 
 
-using LotMassing, .poly2D, .polyShape, CSV
+using LotMassing, .poly2D, .polyShape
 
 # Random.seed!(1236)
 # Random.seed!(1230)
@@ -82,11 +82,11 @@ SELECT codigo_predial, sup_terreno_edif, zona, densidad_bruta_hab_ha, densidad_n
 coef_constructibilidad, ocupacion_suelo, ocupacion_pisos_superiores, coef_constructibilidad_continua, ocupacion_suelo_continua,
 ocupacion_pisos_superiores_continua, coef_area_libre, rasante, num_pisos_continua, altura_max_continua, num_pisos_sobre_edif_continua,
 altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_sobre_edif_continua, distanciamiento_sobre_edif_continua,
-antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios) as predios_str
+antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios,3857) as predios_str
 FROM datos_predios_vitacura
-WHERE codigo_predial = 151600094590126
+WHERE codigo_predial = 151600046100076
 """
-#  151600243500009
+#   151600094590126
 df = pg_julia.query(conn_mygis_db, queryStr)
 
 dcn = datosCabidaNormativa()
@@ -114,23 +114,16 @@ dcn.REDUCCIONESTPORDISTMETRO = false
 
 sup_terreno_edif = df.sup_terreno_edif[1]
 predios_str = df.predios_str[1]
-pos_menos = findall( x -> x .== '-', predios_str)
-num_vertices = Int(length(pos_menos)/2 - 1)
-x = zeros(num_vertices,1)
-y = zeros(num_vertices,1)
-for i = 1:num_vertices
-    x[i] = parse(Float64, predios_str[pos_menos[2*i-1]:pos_menos[2*i]-2])
-    y[i] = parse(Float64, predios_str[pos_menos[2*i]:pos_menos[2*i+1]-2])
-end
+ps = astext2polyshape(predios_str)
 
-V = [x y]
-is_ccw = polyShape.polyOrientation(PolyShape([V],1))
+is_ccw = polyShape.polyOrientation(ps)
+V = ps.Vertices[1]
 if is_ccw == -1 #counter clockwise?
     V = polyShape.reversePath(V)
 end
+factorCorreccion = factorIgualaArea(V, sup_terreno_edif)
 x = V[:,1]
 y = V[:,2]
-factorCorreccion = factorIgualaArea(V, sup_terreno_edif)
 x = factorCorreccion * x
 y = factorCorreccion * y
 x = x .- minimum(x)

@@ -6,9 +6,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     # Posiciona el origen del predio (esq. inferior izquierda) en el punto 0,0. Obtiene estructura con las matrices de rotación
     V_predio, R = infoPredio(dcp.x, dcp.y);
     ps_predio = PolyShape([V_predio], 1)
-    # Corrección por expropiación #
-    #ps_predio = polyShape.polyExpandSides_v2(ps_predio, [-1.5, -1.5, -1.5], [1, 2, 3]) 
-    # #############################
+    
     superficieTerreno = polyShape.polyArea_v2(ps_predio);
        
 
@@ -60,7 +58,6 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     function fitness_restSombra(x)  # Función de Fitness Con Sombra
 
         alt, areaBasal, ps_base, ps_baseSeparada, psCorte = resultConverter(x, t, V_volRestSombra, matConexionVertices_restSombra, vecVertices_restSombra, vecAlturas_restSombra, sepNaves)
-        
         total_fit = 0
         ps_sombraEdif_p, ps_sombraEdif_o, ps_sombraEdif_s = generaSombraEdificio(ps_baseSeparada, alt, ps_publico, ps_calles)
 
