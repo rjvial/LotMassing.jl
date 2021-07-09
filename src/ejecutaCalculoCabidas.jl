@@ -47,7 +47,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
     vecAlturas_restSombra = sort(unique(V_volRestSombra[:,end]))
     altCorteVecinos = dcn.RASANTE * dcn.DISTANCIAMIENTO
     numVertices = size(V_areaEdif, 1);
-    sepNaves = (dca.ANCHOMIN + dca.ANCHOMAX)/2
+    sepNaves = dca.ANCHOMIN#(dca.ANCHOMIN + dca.ANCHOMAX)/2
 
     maxSupConstruida = superficieTerreno * dcn.COEFCONSTRUCTIBILIDAD * (1 + 0.3 * dcp.FUSIONTERRENOS) * (1 + dca.PORCSUPCOMUN)
 
@@ -76,7 +76,7 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         penalizacionConstructibilidad = max(0, areaBasal*numPisos - maxSupConstruida)
         penalizacionDensidad = max(0, areaBasal*numPisos - maxSupConstruidaDensidad)
         total_fit = numPisos * areaBasal - 
-                    100 * numPisos * (penalizacionCoefOcup + penalizacion_r) -
+                    1000* numPisos * (penalizacionCoefOcup + penalizacion_r) -
                     1000*(penalizacionSombra_p + penalizacionSombra_o + penalizacionSombra_s) -
                     1000*(penalizacionConstructibilidad + penalizacionDensidad)
 
@@ -160,12 +160,11 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         sr = [(lb[i], ub[i]) for i = 1:length(lb)]
         fopt_restSombra = 10000
         xopt_restSombra = []
-        MaxSteps_1 = 18000#15000
-        a1 = 5
-        linSpace1 = collect(range(-pi, pi, length = a1))
+        MaxSteps_1 = 30000#18000#15000
+        a1 = 2
+        linSpace1 = collect(range(-pi, pi, length = a1+1))
         kopt1 = 1
-        @showprogress 1 "Exploración de Soluciones...." for k = 1:a1-1
-        #for k = 1:a1-1
+        @showprogress 1 "Exploración de Soluciones...." for k = 1:a1
             lb[2] = linSpace1[k]
             ub[2] = linSpace1[k+1]
             x_k, f_k = evol(fitness_restSombra, lb, ub, MaxSteps_1, MaxStepsWithoutProgress, false)
@@ -178,8 +177,8 @@ function ejecutaCalculoCabidas(dcp, dcn, dca, dcc, dcu, dcf, dcr, conjuntoTempla
         lb2_opt = linSpace1[kopt1]
         ub2_opt = linSpace1[kopt1+1]
 
-        a2 = 7
-        MaxSteps_2 = 20000
+        a2 = 20
+        MaxSteps_2 = 10000
         linSpace2 = collect(range(lb2_opt, ub2_opt, length = a2))
         kopt2 = 1
         @showprogress 1 "Optimización Focalizada......" for k = 1:a2
