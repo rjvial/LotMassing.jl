@@ -41,7 +41,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
 
-        ps_base = polyShape.polyUnion_v2(ps1, ps2)
+        ps_base = polyShape.polyUnion(ps1, ps2)
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
     elseif template == 2 #C
@@ -84,8 +84,8 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
 
-        ps_base = polyShape.polyUnion_v2(ps0, ps1)
-        ps_base = polyShape.polyUnion_v2(ps_base, ps2)
+        ps_base = polyShape.polyUnion(ps0, ps1)
+        ps_base = polyShape.polyUnion(ps_base, ps2)
         ps_baseSeparada = PolyShape([V0, V1, V2], 3)
 
     elseif template == 3 #III
@@ -124,7 +124,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
 
                 V_k = [p1_k';p2_k';p3_k';p4_k']
                 ps_k = PolyShape([V_k], 1)
-                ps = polyShape.polyUnion_v2(ps, ps_k)
+                ps = polyShape.polyUnion(ps, ps_k)
 
                 push!(VV, V_k)
 
@@ -161,7 +161,7 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps1 = PolyShape([V1], 1)
         ps2 = PolyShape([V2], 1)
         
-        ps_base = polyShape.polyUnion_v2(ps1, ps2)
+        ps_base = polyShape.polyUnion(ps1, ps2)
         ps_baseSeparada = PolyShape([V1, V2], 2)
 
 
@@ -202,8 +202,8 @@ function resultConverter(x, template, V, matConexionVertices, vecVertices, vecAl
         ps2 = PolyShape([V2], 1)
         ps3 = PolyShape([V3], 1)
         
-        ps_base = polyShape.polyUnion_v2(ps1, ps2)
-        ps_base = polyShape.polyUnion_v2(ps_base, ps3)
+        ps_base = polyShape.polyUnion(ps1, ps2)
+        ps_base = polyShape.polyUnion(ps_base, ps3)
         ps_baseSeparada = PolyShape([V1, V2, V3], 3)
 
 

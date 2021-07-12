@@ -3,7 +3,7 @@ function generaCalles(ps_predio, ps_publico, anchoEspacioPublico)
     conjuntoAnchoEspPublico = unique(anchoEspacioPublico)
 
     ps_predio_ = polyShape.polyExpand(ps_predio, .01)
-    ps_calles_ = polyShape.polyDifference_v3(ps_publico, ps_predio_)
+    ps_calles_ = polyShape.polyDifference(ps_publico, ps_predio_)
 
     ps_calles = PolyShape([], 0)
     for i = 1:ps_calles_.NumRegions

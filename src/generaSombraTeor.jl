@@ -51,37 +51,37 @@ function generaSombraTeor(ps_volteor, matConexionVertices, vecVertices, ps_publi
                 ps_SombraVolTeor_s.Vertices = push!(ps_SombraVolTeor_s.Vertices, verts_s)
                 ps_SombraVolTeor_s.NumRegions = 1
             else
-                ps_SombraVolTeor_p = polyShape.polyUnion_v2(ps_SombraVolTeor_p, PolyShape([verts_p],1))
-                ps_SombraVolTeor_o = polyShape.polyUnion_v2(ps_SombraVolTeor_o, PolyShape([verts_o],1))
-                ps_SombraVolTeor_s = polyShape.polyUnion_v2(ps_SombraVolTeor_s, PolyShape([verts_s],1))
+                ps_SombraVolTeor_p = polyShape.polyUnion(ps_SombraVolTeor_p, PolyShape([verts_p],1))
+                ps_SombraVolTeor_o = polyShape.polyUnion(ps_SombraVolTeor_o, PolyShape([verts_o],1))
+                ps_SombraVolTeor_s = polyShape.polyUnion(ps_SombraVolTeor_s, PolyShape([verts_s],1))
             end
         end
 
     end
 
 
-    p_p = polyShape.polyDifference_v3(ps_SombraVolTeor_p, ps_publico)
+    p_p = polyShape.polyDifference(ps_SombraVolTeor_p, ps_publico)
     if length(p_p.Vertices) > 0
         ps_SombraVolTeor_p = PolyShape(p_p.Vertices, length(p_p.Vertices))
     else
         ps_SombraVolTeor_p = PolyShape([], 0)
     end
-    p_o = polyShape.polyDifference_v3(ps_SombraVolTeor_o, ps_publico)
+    p_o = polyShape.polyDifference(ps_SombraVolTeor_o, ps_publico)
     if length(p_o.Vertices) > 0
         ps_SombraVolTeor_o = PolyShape(p_o.Vertices, length(p_o.Vertices))
     else
         ps_SombraVolTeor_o = PolyShape([], 0)
     end
-    p_s = polyShape.polyDifference_v3(ps_SombraVolTeor_s, ps_publico)
+    p_s = polyShape.polyDifference(ps_SombraVolTeor_s, ps_publico)
     if length(p_s.Vertices) > 0
         ps_SombraVolTeor_s = PolyShape(p_s.Vertices, length(p_s.Vertices))
     else
         ps_SombraVolTeor_s = PolyShape([], 0)
     end
         
-    ps_SombraVolTeor_p = polyShape.polyDifference_v3(ps_SombraVolTeor_p, ps_calles)
-    ps_SombraVolTeor_o = polyShape.polyDifference_v3(ps_SombraVolTeor_o, ps_calles)
-    ps_SombraVolTeor_s = polyShape.polyDifference_v3(ps_SombraVolTeor_s, ps_calles)
+    ps_SombraVolTeor_p = polyShape.polyDifference(ps_SombraVolTeor_p, ps_calles)
+    ps_SombraVolTeor_o = polyShape.polyDifference(ps_SombraVolTeor_o, ps_calles)
+    ps_SombraVolTeor_s = polyShape.polyDifference(ps_SombraVolTeor_s, ps_calles)
 
     return ps_SombraVolTeor_p, ps_SombraVolTeor_o, ps_SombraVolTeor_s
 end

@@ -15,6 +15,14 @@ mutable struct PolyShape
     NumRegions
 end
 
+
+
+mutable struct LineShape
+    Vertices
+    NumLines
+end
+
+
 mutable struct FlagPlotEdif3D
     predio
     volTeor
@@ -267,7 +275,7 @@ end
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
          datosCabidaFlujo, datosCabidaRentabilidad, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
-         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, FlagPlotEdif3D,
+         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, LineShape, FlagPlotEdif3D,
          ResultadoCabida, RotInfo
 
 
@@ -286,11 +294,12 @@ include("ejecutaCalculoCabidas.jl")
 include("generaVol3d.jl")
 include("generaSombraTeor.jl")
 include("factorIgualaArea.jl")
+include("ajustaCoordenadas.jl")
 include("generaSupBruta.jl")
 include("pg_julia.jl")
 
 export infoPredio, calculaAnguloRotacion,
        generaCalles, generaSombraEdificio, optiEdificio, displayResults, evol, poly2D, polyShape, 
        resultConverter, plotBaseEdificio3d, ejecutaCalculoCabidas, generaVol3d, generaSombraTeor, 
-       generaSupBruta, factorIgualaArea, pg_julia
+       generaSupBruta, factorIgualaArea, ajustaCoordenadas, pg_julia
 end
