@@ -791,13 +791,16 @@ end
 
 
 function geom2shape(geom)
-
     if ArchGDAL.geomname(geom) == "POLYGON"
         geom_ = ArchGDAL.createmultipolygon()
         ArchGDAL.addgeom!(geom_, geom)
         geom = geom_
     elseif ArchGDAL.geomname(geom) == "LINESTRING"
         geom_ = ArchGDAL.createmultilinestring()
+        ArchGDAL.addgeom!(geom_, geom)
+        geom = geom_
+    elseif ArchGDAL.geomname(geom) == "POINT"
+        geom_ = ArchGDAL.createmultipoint()
         ArchGDAL.addgeom!(geom_, geom)
         geom = geom_
     end
@@ -832,13 +835,23 @@ function geom2shape(geom)
         end
         out.NumLines = length(out.Vertices)
         return out
+    elseif ArchGDAL.geomname(geom) == "MULTIPOINT"
+        numPoints = ArchGDAL.ngeom(geom)
+        V = zeros(numPoints, 2)
+        for i = 1:numPoints
+            point_i = ArchGDAL.getgeom(geom, i - 1)
+            V[i,1] = ArchGDAL.getx(point_i, 0)
+            V[i,2] = ArchGDAL.gety(point_i, 0)
+        end
+        out = PointShape(V,numPoints)
+        return out
     end
 end
 
 
 
 function shape2geom(shape)
-    if typeof(shape) == PolyShape
+    if isa(shape, PolyShape)
         n = shape.NumRegions
         out  = ArchGDAL.createmultipolygon()
         for k = 1:n
@@ -850,7 +863,7 @@ function shape2geom(shape)
             ArchGDAL.addgeom!(out, poly_k)    
         end
         return out
-    else
+    elseif isa(shape, LineShape)
         n = shape.NumLines
         out  = ArchGDAL.createmultilinestring()
         for k = 1:n
@@ -860,6 +873,11 @@ function shape2geom(shape)
             ArchGDAL.addgeom!(out, poly_k)    
         end
         return out
+    elseif isa(shape, PointShape)
+        n = shape.NumPoints
+        V = shape.Vertices
+        largo = size(V, 1)
+        out = ArchGDAL.createmultipoint([Float64(V[i,1]) for i = 1: largo] , [Float64(V[i,2]) for i = 1:largo] )
     end
     
     
@@ -882,48 +900,114 @@ end
 
 
 function geomBuffer(shape, dist, nseg)
-    geom = shape2geom(shape)
-    poly_ = ArchGDAL.buffer(geom, dist, nseg)
-    shape_ = geom2shape(poly_)
-    shape_ = PolyShape([shape_.Vertices[1][1:end - 1,:]], 1)
-    is_ccw = polyShape.polyOrientation(shape_)
-    V = shape_.Vertices[1]
-    if is_ccw == -1 # counter clockwise?
-        V = polyShape.reversePath(V)
+    if isa(shape, LineShape)
+        numElementos = shape.NumLines
+    else
+        numElementos = shape.NumRegions
     end
-    ps_out = PolyShape([V], 1)
-    return ps_out
+    if numElementos == 1
+        geom = shape2geom(shape)
+        poly_ = ArchGDAL.buffer(geom, dist, nseg)
+        shape_ = geom2shape(poly_)
+        
+        shape_ = PolyShape([shape_.Vertices[1][1:end - aux,:]], 1)
+        is_ccw = polyShape.polyOrientation(shape_)
+        V = shape_.Vertices[1]
+        if is_ccw == -1 # counter clockwise?
+            V = polyShape.reversePath(V)
+        end
+        ps_out = PolyShape([V], 1)
+        return ps_out    
+    else
+        V = []
+        for k = 1:numElementos
+            shape_k = isa(shape, LineShape) ? LineShape([shape.Vertices[k]],1) : PolyShape([shape.Vertices[k]],1)
+            geom_k = shape2geom(shape_k)
+            poly_k = ArchGDAL.buffer(geom_k, dist, nseg)
+            shape_k_ = geom2shape(poly_k)
+            shape_k_ = PolyShape([shape_k_.Vertices[1][1:end - 1,:]], 1)
+            is_ccw = polyShape.polyOrientation(shape_k_)
+            V_k = shape_k_.Vertices[1]
+            if is_ccw == -1 # counter clockwise?
+                V_k = polyShape.reversePath(V_k)
+            end
+            push!(V,V_k)
+        end
+        ps_out = PolyShape(V, numElementos)
+        return ps_out    
+    end
 end
 
 
+function shapeCentroid(shape)
+    geom_point = ArchGDAL.centroid(shape2geom(shape))
+    out = geom2shape(geom_point)
+    return out
+end
+
+function partialCentroid(shape)
+    if isa(shape,PolyShape)
+        numElements = shape.NumRegions
+    elseif isa(shape,LineShape)
+        numElements = shape.NumLines
+    end
+    V = zeros(numElements,2)
+    for i = 1:numElements
+        shape_i = subShape(shape, i)
+        cent_i = shapeCentroid(shape_i)
+        V[i,:] = cent_i.Vertices
+    end
+    out = PointShape(V,numElements)
+    return out
+end
 
 
+function shapeDistance(shape1, shape2)
+    geom1 = shape2geom(shape1)
+    geom2 = shape2geom(shape2)
+    dist = ArchGDAL.distance(geom1, geom2)
+    return dist
+end
+
+
+function partialDistance(shape1, shape2)
+    if isa(shape1, PolyShape)
+        numElements1 = shape1.NumRegions
+    elseif isa(shape1, LineShape)
+        numElements1 = shape1.NumLines
+    elseif isa(shape1, PointShape)
+        numElements1 = shape1.NumPoints
+    end
+    if isa(shape2, PolyShape)
+        numElements2 = shape2.NumRegions
+    elseif isa(shape2, LineShape)
+        numElements2 = shape2.NumLines
+    elseif isa(shape2, PointShape)
+        numElements2 = shape2.NumPoints
+    end
+    distMat = zeros(numElements1,numElements2)
+    for i = 1:numElements1
+        shape_i = subShape(shape1,i)
+        for j = 1:numElements2
+            shape_j = subShape(shape2,j)
+            distMat[i,j] = shapeDistance(shape_i, shape_j)
+        end
+    end
+    return distMat
+end
 
 function astext2polyshape(str)
-    pos_menos = findall(x -> x .== '-', str)
-    num_vertices = Int(length(pos_menos) / 2 - 1)
-    x = zeros(num_vertices, 1)
-    y = zeros(num_vertices, 1)
-    for i = 1:num_vertices
-        x[i] = parse(Float64, str[pos_menos[2 * i - 1]:pos_menos[2 * i] - 2])
-        y[i] = parse(Float64, str[pos_menos[2 * i]:pos_menos[2 * i + 1] - 2])
-    end
-    V = [x y]
+    shape = geom2shape(ArchGDAL.fromWKT(str))
+    V_ = shape.Vertices[1]
+    V = V_[1:end-1,:]
     ps_out = PolyShape([V], 1)
     return ps_out
 end
 
 
 function astext2lineshape(str::String)
-    pos_menos = findall(x -> x .== '-', str)
-    num_vertices = Int(length(pos_menos) / 2 - 1)
-    x = zeros(num_vertices, 1)
-    y = zeros(num_vertices, 1)
-    for i = 1:num_vertices
-        x[i] = parse(Float64, str[pos_menos[2 * i - 1]:pos_menos[2 * i] - 2])
-        y[i] = parse(Float64, str[pos_menos[2 * i]:pos_menos[2 * i + 1] - 2])
-    end
-    V = [x y]
+    shape = geom2shape(ArchGDAL.fromWKT(str))
+    V = shape.Vertices[1]
     ls_out = LineShape([V], 1)
     return ls_out
 end
@@ -942,6 +1026,8 @@ function astext2lineshape(str_array::Array)
     return ls_out
 end
 
+
+######## CLIPPER ############################################
 
 function clipper2polyshape(poly)
     numRegiones = length(poly)
@@ -983,6 +1069,20 @@ function polyUnion(ps_s, ps_c)
 
     return ps_out
 end
+function polyUnion(ps)
+    ps_out = PolyShape([],1)
+    if ps.NumRegions >= 2
+        for i=1:ps.NumRegions
+            if i==1
+                ps_out = PolyShape([ps.Vertices[1]],1)
+            else
+                ps_out = polyUnion(ps_out, subShape(ps,i))
+            end
+        end
+    end
+    return ps_out
+end
+
 
 
 function polyDifference(ps_s, ps_c)
@@ -1002,6 +1102,8 @@ function polyIntersect(ps_s, ps_c)
     ps_out = clipper2polyshape(poly_)
     return ps_out
 end
+
+#######################################################
 
 
 function polyExpand(ps, dist)
@@ -1072,9 +1174,20 @@ function polyExpandSides_v2(ps, vecDist, vecLados)
 end
 
 
+function subShape(shape, k)
+    if isa(shape, LineShape)
+        out_shape = LineShape([shape.Vertices[k]],1)
+    else
+        out_shape = PolyShape([shape.Vertices[k]],1)
+    end
+    return out_shape 
+end
+
+
     export extraeInfoPoly, isPolyConvex, isPolyInPoly, plotPolyshape, plotPolyshape3d_v1, plotPolyshape3d_v2, plotPolyshape3d_v3,
         polyArea_v2, polyDifference, polyShape2constraints, polyOrientation, polyUnion, geomBuffer,
         polyIntersect, polyIntersect_v2, polyIntersect_v3, polyExpand, polyExpandSides, plotPolyshape3d_v4, plotPolyshape3d_v5,
-        polyExpandSides_v2, polyshape2clipper, clipper2polyshape, shape2geom, geom2shape, astext2polyshape, astext2lineshape, polySimplify
+        polyExpandSides_v2, polyshape2clipper, clipper2polyshape, shape2geom, geom2shape, astext2polyshape, astext2lineshape, polySimplify,
+        subShape, shapeCentroid, partialCentroid, shapeDistance, partialDistance
 
 end

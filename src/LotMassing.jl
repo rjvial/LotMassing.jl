@@ -23,6 +23,13 @@ mutable struct LineShape
 end
 
 
+mutable struct PointShape
+    Vertices
+    NumPoints
+end
+
+
+
 mutable struct FlagPlotEdif3D
     predio
     volTeor
@@ -275,8 +282,8 @@ end
 
 export datosCabidaPredio, datosCabidaNormativa, datosCabidaArquitectura, datosCabidaComercial, datosCabidaUnit,
          datosCabidaFlujo, datosCabidaRentabilidad, salidaArquitectonica, salidaIndicadores, salidaMonetaria,
-         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, LineShape, FlagPlotEdif3D,
-         ResultadoCabida, RotInfo
+         salidaTerreno, salidaOptimizacion, salidaNormativa, salidaFlujoCaja, PolyShape, LineShape, PointShape, 
+         FlagPlotEdif3D, ResultadoCabida, RotInfo
 
 
 include("infoPredio.jl")

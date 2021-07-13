@@ -114,7 +114,7 @@ y = V[:,2]
 dcp = datosCabidaPredio(x, y, [1], [15], 0, 200);
 
 
-# Sql calles contenidas en buffer del predio 
+# Sql calles contenidas en buffer del predio
 queryStr = """ 
 WITH buffer_predio AS (select ST_Buffer(geom_predios, .0001) as geom
 			from datos_predios_vitacura
@@ -133,6 +133,8 @@ for i = 1:ls.NumLines
     V_i = ajustaCoordenadas(V_i, factorCorreccion, dx, dy)
     ls.Vertices[i] = V_i
 end
+calles_center = partialCentroid(ls)
+shape_calles = geomBuffer(ls,5,5)
 
 
 
@@ -143,6 +145,14 @@ from datos_predios_vitacura
 where codigo_predial = 151600041300008
 """
 df__ = pg_julia.query(conn_mygis_db, queryStr)
+seg = astext2lineshape(df__.segmentos_str)
+for i = 1:seg.NumLines
+    V_i = seg.Vertices[i]
+    V_i = ajustaCoordenadas(V_i, factorCorreccion, dx, dy)
+    seg.Vertices[i] = V_i
+end
+seg_center = partialCentroid(seg)
+
 
 resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
 ps_volteor, matConexionVertices, vecVertices,
