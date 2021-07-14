@@ -910,7 +910,7 @@ function geomBuffer(shape, dist, nseg)
         poly_ = ArchGDAL.buffer(geom, dist, nseg)
         shape_ = geom2shape(poly_)
         
-        shape_ = PolyShape([shape_.Vertices[1][1:end - aux,:]], 1)
+        shape_ = PolyShape([shape_.Vertices[1][1:end - 1,:]], 1)
         is_ccw = polyShape.polyOrientation(shape_)
         V = shape_.Vertices[1]
         if is_ccw == -1 # counter clockwise?
@@ -1175,10 +1175,12 @@ end
 
 
 function subShape(shape, k)
-    if isa(shape, LineShape)
-        out_shape = LineShape([shape.Vertices[k]],1)
-    else
+    if isa(shape, PolyShape)
         out_shape = PolyShape([shape.Vertices[k]],1)
+    elseif isa(shape, LineShape)
+        out_shape = LineShape([shape.Vertices[k]],1)
+    elseif isa(shape, PointShape)
+        out_shape = PointShape([shape.Vertices[k,1] shape.Vertices[k,2]],1)
     end
     return out_shape 
 end

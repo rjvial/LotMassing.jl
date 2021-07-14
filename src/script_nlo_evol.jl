@@ -63,9 +63,9 @@ altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_so
 antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios,3857) as predios_str,
 area_calculada
 FROM datos_predios_vitacura
-WHERE codigo_predial = 151600041300008  
+WHERE codigo_predial = 151600050990072
 """
-#   151600094590126  151600044500516 151600050990072 151600041300008
+#   151600094590126  151600044500516 151600050990072 151600041300008 151600108990001 151600147500003
 df = pg_julia.query(conn_mygis_db, queryStr)
 
 dcn = datosCabidaNormativa()
@@ -95,7 +95,7 @@ sup_terreno_edif = df.sup_terreno_edif[1]<1 ? df.area_calculada[1] : df.sup_terr
 predios_str = df.predios_str[1]
 ps = astext2polyshape(predios_str)
 
-# Simplifica y corrige orientacion del predio
+# Simplifica, corrige orientacion y escala del predio
 is_ccw = polyShape.polyOrientation(ps)
 V = ps.Vertices[1]
 if is_ccw == -1 #counter clockwise?
@@ -106,19 +106,36 @@ if size(V,1) > 8
     ps = polySimplify(ps, .00003)
     V = ps.Vertices[1]
 end
-
 factorCorreccion = factorIgualaArea(V, sup_terreno_edif)
 V, dx, dy = ajustaCoordenadas(V, factorCorreccion)
+ps_predio = PolyShape([V],1)
 x = V[:,1]
 y = V[:,2]
-dcp = datosCabidaPredio(x, y, [1], [15], 0, 200);
+
+
+
+# Sql segmentos del predio 
+V_seg = []
+numSeg = size(V,1)
+for i = 1:numSeg
+    if i < numSeg
+        V_seg_i = [V[i,1] V[i,2]; V[i+1,1] V[i+1,2]]
+    else
+        V_seg_i = [V[i,1] V[i,2]; V[1,1] V[1,2]]
+    end
+    push!(V_seg, V_seg_i)
+end
+ls_segmentos = LineShape(V_seg, numSeg)
+seg_center = partialCentroid(ls_segmentos)
+
+
 
 
 # Sql calles contenidas en buffer del predio
 queryStr = """ 
-WITH buffer_predio AS (select ST_Buffer(geom_predios, .0001) as geom
+WITH buffer_predio AS (select ST_Buffer(geom_predios, .0003) as geom
 			from datos_predios_vitacura
-			where codigo_predial = 151600041300008
+			where codigo_predial = 151600050990072
 			),
 	 calles AS (select ST_Transform(mc.geom, 4326) as geom
 		    from maestro_de_calles as mc 
@@ -127,31 +144,43 @@ select ST_AsText(st_intersection(buffer_predio.geom, calles.geom)) as calles_str
 from calles join buffer_predio on st_intersects(buffer_predio.geom, calles.geom)
 """
 df_ = pg_julia.query(conn_mygis_db, queryStr)
-ls = astext2lineshape(df_.calles_str)
-for i = 1:ls.NumLines
-    V_i = ls.Vertices[i]
+ls_calles = astext2lineshape(df_.calles_str)
+for i = 1:ls_calles.NumLines
+    V_i = ls_calles.Vertices[i]
     V_i = ajustaCoordenadas(V_i, factorCorreccion, dx, dy)
-    ls.Vertices[i] = V_i
+    ls_calles.Vertices[i] = V_i
 end
-calles_center = partialCentroid(ls)
-shape_calles = geomBuffer(ls,5,5)
-
-
-
-# Sql segmentos del predio 
-queryStr = """
-select ST_AsText((ST_Dump(geom_segmentos)).geom) as segmentos_str
-from datos_predios_vitacura
-where codigo_predial = 151600041300008
-"""
-df__ = pg_julia.query(conn_mygis_db, queryStr)
-seg = astext2lineshape(df__.segmentos_str)
-for i = 1:seg.NumLines
-    V_i = seg.Vertices[i]
-    V_i = ajustaCoordenadas(V_i, factorCorreccion, dx, dy)
-    seg.Vertices[i] = V_i
+V_calles_nvo = []
+for i = 1:ls_calles.NumLines
+    V_calles_i = ls_calles.Vertices[i]
+    if size(V_calles_i,1) >= 3
+        for j = 1:size(V_calles_i,1)-1
+            V_calles_ij = [V_calles_i[j,1] V_calles_i[j,2]; V_calles_i[j+1,1] V_calles_i[j+1,2]]
+            push!(V_calles_nvo,V_calles_ij)
+        end
+    end
 end
-seg_center = partialCentroid(seg)
+ls_calles = LineShape(V_calles_nvo, size(V_calles_nvo,1))
+calles_center = partialCentroid(ls_calles)
+
+
+matDist = partialDistance(seg_center, calles_center)
+
+numSeg = seg_center.NumPoints
+vecSecConCalle = []
+vecAnchoCalle = []
+for i = 1:numSeg
+    minDist_i = minimum(matDist[i,:])
+    if minDist_i <= 20
+        idSegmentoCalle_i = argmin(matDist[i,:])
+        semiAnchoCalle_i = shapeDistance(subShape(seg_center,i), subShape(ls_calles,idSegmentoCalle_i))
+        push!(vecSecConCalle, Int64(i))
+        push!(vecAnchoCalle, semiAnchoCalle_i*2) 
+    end
+end
+
+
+dcp = datosCabidaPredio(x, y, vecSecConCalle, vecAnchoCalle, 0, 200);
 
 
 resultados, ps_calles, ps_publico, ps_predio, ps_base, ps_baseSeparada, 
