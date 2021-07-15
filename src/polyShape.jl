@@ -996,6 +996,8 @@ function partialDistance(shape1, shape2)
     return distMat
 end
 
+
+
 function astext2polyshape(str)
     shape = geom2shape(ArchGDAL.fromWKT(str))
     V_ = shape.Vertices[1]

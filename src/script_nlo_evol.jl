@@ -63,7 +63,7 @@ altura_max_sobre_edif_continua, num_pisos_total, altura_max_total, antejardin_so
 antejardin, distanciamiento, ochavo, adosamiento_edif_continua, adosamiento_edif_aislada, ST_AsText(geom_predios,3857) as predios_str,
 area_calculada
 FROM datos_predios_vitacura
-WHERE codigo_predial = 151600050990072
+WHERE codigo_predial = 151600044500516
 """
 #   151600094590126  151600044500516 151600050990072 151600041300008 151600108990001 151600147500003
 df = pg_julia.query(conn_mygis_db, queryStr)
@@ -128,14 +128,24 @@ end
 ls_segmentos = LineShape(V_seg, numSeg)
 seg_center = partialCentroid(ls_segmentos)
 
-
+"""
+matDist_seg = ones(seg_center.NumPoints, seg_center.NumPoints)*100000
+for i = 1:seg_center.NumPoints-1
+    shape_i = subShape(seg_center,i)
+    for j = 1:seg_center.NumPoints
+        shape_j = subShape(seg_center,j)
+        matDist_seg[i,j] = i == j ? 100000 : shapeDistance(shape_i, shape_j)
+    end
+end
+minDistSeg = minimum(matDist_seg, dims=2)
+"""
 
 
 # Sql calles contenidas en buffer del predio
 queryStr = """ 
 WITH buffer_predio AS (select ST_Buffer(geom_predios, .0003) as geom
 			from datos_predios_vitacura
-			where codigo_predial = 151600050990072
+			where codigo_predial = 151600044500516
 			),
 	 calles AS (select ST_Transform(mc.geom, 4326) as geom
 		    from maestro_de_calles as mc 
@@ -158,21 +168,23 @@ for i = 1:ls_calles.NumLines
             V_calles_ij = [V_calles_i[j,1] V_calles_i[j,2]; V_calles_i[j+1,1] V_calles_i[j+1,2]]
             push!(V_calles_nvo,V_calles_ij)
         end
+    else
+        push!(V_calles_nvo,V_calles_i)
     end
 end
 ls_calles = LineShape(V_calles_nvo, size(V_calles_nvo,1))
 calles_center = partialCentroid(ls_calles)
 
 
-matDist = partialDistance(seg_center, calles_center)
+matDist_seg_calles = partialDistance(seg_center, calles_center)
 
 numSeg = seg_center.NumPoints
 vecSecConCalle = []
 vecAnchoCalle = []
 for i = 1:numSeg
-    minDist_i = minimum(matDist[i,:])
+    minDist_i = minimum(matDist_seg_calles[i,:])
     if minDist_i <= 20
-        idSegmentoCalle_i = argmin(matDist[i,:])
+        idSegmentoCalle_i = argmin(matDist_seg_calles[i,:])
         semiAnchoCalle_i = shapeDistance(subShape(seg_center,i), subShape(ls_calles,idSegmentoCalle_i))
         push!(vecSecConCalle, Int64(i))
         push!(vecAnchoCalle, semiAnchoCalle_i*2) 
